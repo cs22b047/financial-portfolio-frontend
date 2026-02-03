@@ -10,8 +10,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { ArrowLeft, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
+import { ArrowLeft, TrendingUp, TrendingDown, AlertCircle, ExternalLink, Newspaper } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { PriceHistoryChart } from '@/components/dashboard/PriceHistoryChart';
+import { PriceHistory, News } from '@/types/portfolio';
 
 interface MarketData {
   symbol: string;
@@ -54,6 +56,8 @@ export default function AssetInformation() {
   const navigate = useNavigate();
   const [marketData, setMarketData] = useState<MarketData | null>(null);
   const [esgRating, setEsgRating] = useState<ESGRating | null>(null);
+  const [priceHistory, setPriceHistory] = useState<PriceHistory[]>([]);
+  const [news, setNews] = useState<News[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
@@ -217,6 +221,24 @@ export default function AssetInformation() {
       if (esgResponse.ok) {
         const esgDataRes = await esgResponse.json();
         setEsgRating(esgDataRes);
+      }
+
+      // Fetch price history
+      const priceHistoryResponse = await fetch(`${apiUrl}/api/price-history/symbol/${symbol}`);
+      if (priceHistoryResponse.ok) {
+        const priceHistoryData = await priceHistoryResponse.json();
+        setPriceHistory(priceHistoryData);
+      }
+
+      // Fetch news
+      const newsResponse = await fetch(`${apiUrl}/api/news/symbol/${symbol}`);
+      if (newsResponse.ok) {
+        const newsData = await newsResponse.json();
+        // Sort by date descending and take top 6
+        const sortedNews = newsData.sort((a: News, b: News) => 
+          new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime()
+        ).slice(0, 6);
+        setNews(sortedNews);
       }
     } catch (err) {
       setError('Failed to load asset information');
@@ -401,6 +423,9 @@ export default function AssetInformation() {
           </CardContent>
         </Card>
 
+        {/* Price History Chart */}
+        <PriceHistoryChart data={priceHistory} symbol={symbol || ''} />
+
         {/* ESG Ratings */}
         {esgRating && (
           <Card>
@@ -461,33 +486,91 @@ export default function AssetInformation() {
           </Card>
         )}
 
-        {/* News Section (Placeholder) */}
-        <Card className="border-dashed border-2 border-muted-foreground/30">
+        {/* News Section */}
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              📰 Latest News
-              <span className="text-xs font-normal text-muted-foreground ml-auto">Coming Soon</span>
+              <Newspaper className="h-5 w-5" />
+              Latest News
+              {news.length > 0 && (
+                <span className="text-xs font-normal text-muted-foreground ml-auto">
+                  {news.length} article{news.length !== 1 ? 's' : ''}
+                </span>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              <p className="text-muted-foreground">
-                Recent news articles about {marketData.name} will appear here when the news endpoint is fully implemented.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="border border-border rounded-lg p-4 bg-secondary/30 animate-pulse">
-                    <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
-                    <div className="h-3 bg-muted rounded w-full mb-2"></div>
-                    <div className="h-3 bg-muted rounded w-2/3"></div>
-                    <div className="flex justify-between items-center mt-3">
-                      <div className="h-2 bg-muted rounded w-1/4"></div>
-                      <div className="h-2 bg-muted rounded w-1/4"></div>
+            {news.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Newspaper className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                <p>No recent news articles available for {marketData.name}</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {news.map((article) => (
+                  <div
+                    key={article.id}
+                    className="border border-border rounded-lg p-4 hover:bg-secondary/50 transition-colors group"
+                  >
+                    {/* Article Header */}
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">
+                        {article.title}
+                      </h3>
+                      {article.sentiment && (
+                        <span
+                          className={cn(
+                            'text-xs px-2 py-0.5 rounded-full shrink-0',
+                            article.sentiment === 'positive' && 'bg-green-500/20 text-green-600',
+                            article.sentiment === 'negative' && 'bg-red-500/20 text-red-600',
+                            article.sentiment === 'neutral' && 'bg-gray-500/20 text-gray-600'
+                          )}
+                        >
+                          {article.sentiment}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Article Summary */}
+                    {article.summary && (
+                      <p className="text-xs text-muted-foreground line-clamp-3 mb-3">
+                        {article.summary}
+                      </p>
+                    )}
+
+                    {/* Article Footer */}
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        {article.source && (
+                          <span className="font-medium">{article.source}</span>
+                        )}
+                        {article.publishedDate && (
+                          <span>
+                            {new Date(article.publishedDate).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric'
+                            })}
+                          </span>
+                        )}
+                      </div>
+                      {article.link && (
+                        <a
+                          href={article.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-primary hover:underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Read
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      )}
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
 
