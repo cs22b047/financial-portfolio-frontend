@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { mockAssets, assetTypes } from '@/data/mockData';
-import { Asset, AssetTypeCode } from '@/types/portfolio';
+import { Asset, AssetTypeCode, MarketData } from '@/types/portfolio';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -20,20 +20,407 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Search, ArrowUpDown, TrendingUp, TrendingDown, Filter } from 'lucide-react';
 
 type SortField = 'symbol' | 'total_value' | 'gain_loss_percent' | 'quantity';
 type SortDirection = 'asc' | 'desc';
 
+interface AddAssetFormData {
+  action: 'buy' | 'watchlist';
+  symbol: string;
+  quantity: string;
+  price: string;
+  date: string;
+  targetPrice: string;
+}
+
+// Add Asset Form Component
+function AddAssetDialog() {
+  const [open, setOpen] = useState(false);
+  const [marketDataList, setMarketDataList] = useState<MarketData[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState<AddAssetFormData>({
+    action: 'buy',
+    symbol: '',
+    quantity: '',
+    price: '',
+    date: new Date().toISOString().split('T')[0],
+    targetPrice: '',
+  });
+  const [submitting, setSubmitting] = useState(false);
+
+  // Fetch market data on dialog open
+  useEffect(() => {
+    if (open && marketDataList.length === 0) {
+      fetchMarketData();
+    }
+  }, [open]);
+
+  const fetchMarketData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+      const response = await fetch(`${apiUrl}/api/market-data`);
+      if (!response.ok) throw new Error('Failed to fetch market data');
+      const data = await response.json();
+      setMarketDataList(data);
+    } catch (err) {
+      setError('Failed to load market data');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSymbolChange = (symbol: string) => {
+    setFormData(prev => ({ ...prev, symbol }));
+    // Auto-fill price from market data
+    const marketData = marketDataList.find(m => m.symbol === symbol);
+    if (marketData) {
+      setFormData(prev => ({
+        ...prev,
+        price: marketData.currentPrice.toString(),
+      }));
+    }
+  };
+
+  const handleQuantityChange = (quantity: string) => {
+    setFormData(prev => ({ ...prev, quantity }));
+  };
+
+  const handlePriceChange = (price: string) => {
+    setFormData(prev => ({ ...prev, price }));
+  };
+
+  const handleDateChange = (date: string) => {
+    setFormData(prev => ({ ...prev, date }));
+  };
+
+  const totalPrice = useMemo(() => {
+    const qty = parseFloat(formData.quantity) || 0;
+    const price = parseFloat(formData.price) || 0;
+    return (qty * price).toFixed(2);
+  }, [formData.quantity, formData.price]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+      
+      if (formData.action === 'buy') {
+        // Validate form data for buy
+        if (!formData.symbol || !formData.quantity || !formData.price || !formData.date) {
+          throw new Error('All fields are required');
+        }
+
+        const payload = {
+          symbol: formData.symbol,
+          quantity: parseFloat(formData.quantity),
+          price: parseFloat(formData.price),
+          date: formData.date,
+        };
+
+        const response = await fetch(`${apiUrl}/api/assets/buy`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || 'Failed to buy asset');
+        }
+      } else {
+        // Watchlist mode
+        if (!formData.symbol) {
+          throw new Error('Symbol is required');
+        }
+
+        const payload = {
+          symbol: formData.symbol,
+          targetPrice: formData.targetPrice ? parseFloat(formData.targetPrice) : null,
+        };
+
+        const response = await fetch(`${apiUrl}/api/assets/watchlist`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || 'Failed to add to watchlist');
+        }
+      }
+
+      // Reset form and close dialog
+      setFormData({
+        action: 'buy',
+        symbol: '',
+        quantity: '',
+        price: '',
+        date: new Date().toISOString().split('T')[0],
+        targetPrice: '',
+      });
+      setOpen(false);
+      // Trigger page refresh to show new asset
+      window.location.reload();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error(err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const selectedMarketData = marketDataList.find(m => m.symbol === formData.symbol);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button className="bg-primary hover:bg-primary/90">
+          + Add Asset
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>Add New Asset</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+              {error}
+            </div>
+          )}
+
+          {/* Action Type Selection */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Action</label>
+            <Select value={formData.action} onValueChange={(value: 'buy' | 'watchlist') => setFormData(prev => ({ ...prev, action: value }))}>
+              <SelectTrigger className="bg-secondary border-border">
+                <SelectValue placeholder="Select action" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="buy">Buy Asset</SelectItem>
+                <SelectItem value="watchlist">Add to Watchlist</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Company Symbol Dropdown */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Company</label>
+            <Select value={formData.symbol} onValueChange={handleSymbolChange} disabled={loading}>
+              <SelectTrigger className="bg-secondary border-border">
+                <SelectValue placeholder={loading ? 'Loading...' : 'Select a company'} />
+              </SelectTrigger>
+              <SelectContent>
+                {marketDataList.map((market) => (
+                  <SelectItem key={market.id} value={market.symbol}>
+                    {market.name} ({market.symbol})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Display selected company info */}
+          {selectedMarketData && (
+            <div className="rounded-md bg-secondary/50 p-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Current Price:</span>
+                <span className="font-medium">${selectedMarketData.currentPrice.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Sector:</span>
+                <span className="font-medium">{selectedMarketData.sector}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Conditional Fields based on Action */}
+          {formData.action === 'buy' ? (
+            <>
+              {/* Quantity Input */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Quantity</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  placeholder="Enter quantity"
+                  value={formData.quantity}
+                  onChange={(e) => handleQuantityChange(e.target.value)}
+                  className="bg-secondary border-border"
+                  required
+                />
+              </div>
+
+              {/* Price Input */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Price per Unit</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  placeholder="Enter price"
+                  value={formData.price}
+                  onChange={(e) => handlePriceChange(e.target.value)}
+                  className="bg-secondary border-border"
+                  required
+                />
+              </div>
+
+              {/* Total Price Display */}
+              <div className="rounded-md bg-secondary/50 p-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-muted-foreground">Total Price:</span>
+                  <span className="text-lg font-bold">${totalPrice}</span>
+                </div>
+              </div>
+
+              {/* Date Input */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Purchase Date</label>
+                <Input
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => handleDateChange(e.target.value)}
+                  className="bg-secondary border-border"
+                  required
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Target Price Input for Watchlist */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Target Price (Optional)</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  placeholder="Enter target price"
+                  value={formData.targetPrice}
+                  onChange={(e) => setFormData(prev => ({ ...prev, targetPrice: e.target.value }))}
+                  className="bg-secondary border-border"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Set a target price to get alerts when the stock reaches this level.
+                </p>
+              </div>
+            </>
+          )}
+
+          {/* Submit Button */}
+          <div className="flex gap-2 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+              disabled={submitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="bg-primary hover:bg-primary/90"
+              disabled={
+                submitting || 
+                !formData.symbol || 
+                (formData.action === 'buy' && (!formData.quantity || !formData.price))
+              }
+            >
+              {submitting 
+                ? (formData.action === 'buy' ? 'Buying...' : 'Adding...') 
+                : (formData.action === 'buy' ? 'Buy Asset' : 'Add to Watchlist')
+              }
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export default function Assets() {
+  const [assets, setAssets] = useState<Asset[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [assetTypeFilter, setAssetTypeFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [sortField, setSortField] = useState<SortField>('total_value');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch assets from API
+  useEffect(() => {
+    fetchAssets();
+  }, []);
+
+  const fetchAssets = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+      const response = await fetch(`${apiUrl}/api/assets`);
+      if (!response.ok) throw new Error('Failed to fetch assets');
+      const data = await response.json();
+      // Map API response to frontend format with null safety
+      const assetsWithCalculations = data.map((asset: any) => {
+        const currentPrice = asset.currentPrice || 0;
+        const purchasePrice = asset.purchasePrice || 0;
+        const quantity = asset.quantity || 0;
+        return {
+          id: asset.id,
+          symbol: asset.symbol,
+          name: asset.name || asset.marketData?.name || '',
+          status: asset.status,
+          quantity: quantity,
+          purchase_price: purchasePrice,
+          current_price: currentPrice,
+          purchase_date: asset.purchaseDate,
+          sector: asset.sector || asset.marketData?.sector || '',
+          asset_type_id: asset.assetType?.id || 1,
+          market_data_id: asset.marketData?.id,
+          target_price: asset.targetPrice,
+          added_to_watchlist_date: asset.addedToWatchlistDate,
+          price_alerts_enabled: asset.priceAlertsEnabled,
+          notes: asset.notes,
+          priority_rank: asset.priorityRank,
+          created_date: asset.createdDate,
+          updated_date: asset.updatedDate,
+          total_value: quantity * currentPrice,
+          gain_loss: purchasePrice > 0 ? (currentPrice - purchasePrice) * quantity : 0,
+          gain_loss_percent: purchasePrice > 0 ? ((currentPrice - purchasePrice) / purchasePrice) * 100 : 0,
+        };
+      });
+      setAssets(assetsWithCalculations);
+    } catch (err) {
+      setError('Failed to load assets');
+      console.error(err);
+      // Fallback to mock data
+      setAssets(mockAssets);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredAssets = useMemo(() => {
-    let result = [...mockAssets];
+    let result = [...assets];
 
     // Search filter
     if (searchQuery) {
@@ -78,7 +465,7 @@ export default function Assets() {
     });
 
     return result;
-  }, [searchQuery, assetTypeFilter, statusFilter, sortField, sortDirection]);
+  }, [searchQuery, assetTypeFilter, statusFilter, sortField, sortDirection, assets]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -113,10 +500,22 @@ export default function Assets() {
             <h1 className="text-2xl font-bold text-foreground">Assets</h1>
             <p className="text-muted-foreground">Manage and track all your assets</p>
           </div>
-          <Button className="bg-primary hover:bg-primary/90">
-            + Add Asset
-          </Button>
+          <AddAssetDialog />
         </div>
+
+        {/* Error Display */}
+        {error && (
+          <div className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">
+            {error}
+          </div>
+        )}
+
+        {/* Loading State */}
+        {loading && (
+          <div className="rounded-md bg-secondary/50 p-4 text-center text-muted-foreground">
+            Loading assets...
+          </div>
+        )}
 
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-4">
@@ -136,10 +535,11 @@ export default function Assets() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="STOCK">Stocks</SelectItem>
-              <SelectItem value="BOND">Bonds</SelectItem>
-              <SelectItem value="CASH">Cash</SelectItem>
+              <SelectItem value="STOCK">Stock</SelectItem>
+              <SelectItem value="STOCK">ETF</SelectItem>
               <SelectItem value="CRYPTO">Crypto</SelectItem>
+              <SelectItem value="BOND">Bond</SelectItem>
+              <SelectItem value="CASH">Cash</SelectItem>
             </SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -148,9 +548,10 @@ export default function Assets() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="sold">Sold</SelectItem>
-              <SelectItem value="watching">Watching</SelectItem>
+              <SelectItem value="OWNED">Owned</SelectItem>
+              <SelectItem value="WATCHLIST">Watchlist</SelectItem>
+              <SelectItem value="RESEARCH">Research</SelectItem>
+              <SelectItem value="SOLD">Sold</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -171,6 +572,7 @@ export default function Assets() {
                   </Button>
                 </TableHead>
                 <TableHead className="text-muted-foreground">Type</TableHead>
+                <TableHead className="text-muted-foreground">Status</TableHead>
                 <TableHead className="text-muted-foreground text-right">
                   <Button
                     variant="ghost"
@@ -181,7 +583,8 @@ export default function Assets() {
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                   </Button>
                 </TableHead>
-                <TableHead className="text-muted-foreground text-right">Price</TableHead>
+                <TableHead className="text-muted-foreground text-right">Purchase Price</TableHead>
+                <TableHead className="text-muted-foreground text-right">Current Price</TableHead>
                 <TableHead className="text-muted-foreground text-right">
                   <Button
                     variant="ghost"
@@ -221,9 +624,21 @@ export default function Assets() {
                       {getAssetTypeName(asset.asset_type_id)}
                     </span>
                   </TableCell>
-                  <TableCell className="text-right font-medium">{asset.quantity}</TableCell>
-                  <TableCell className="text-right">${asset.current_price.toLocaleString()}</TableCell>
-                  <TableCell className="text-right font-semibold">${asset.total_value?.toLocaleString()}</TableCell>
+                  <TableCell>
+                    <span className={cn(
+                      'rounded-full px-2 py-1 text-xs font-medium',
+                      asset.status === 'OWNED' && 'bg-success/20 text-success',
+                      asset.status === 'WATCHLIST' && 'bg-blue-500/20 text-blue-500',
+                      asset.status === 'RESEARCH' && 'bg-warning/20 text-warning',
+                      asset.status === 'SOLD' && 'bg-muted text-muted-foreground'
+                    )}>
+                      {asset.status || 'N/A'}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-right font-medium">{(asset.quantity || 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</TableCell>
+                  <TableCell className="text-right">${(asset.purchase_price || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
+                  <TableCell className="text-right">${(asset.current_price || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
+                  <TableCell className="text-right font-semibold">${(asset.total_value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                   <TableCell className="text-right">
                     <div className={cn(
                       'flex items-center justify-end gap-1',
@@ -240,7 +655,7 @@ export default function Assets() {
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      ${asset.gain_loss?.toLocaleString()}
+                      ${(asset.gain_loss || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                   </TableCell>
                 </TableRow>
@@ -251,7 +666,7 @@ export default function Assets() {
 
         {/* Summary */}
         <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <span>Showing {filteredAssets.length} of {mockAssets.length} assets</span>
+          <span>Showing {filteredAssets.length} of {assets.length} assets</span>
         </div>
       </div>
     </MainLayout>
