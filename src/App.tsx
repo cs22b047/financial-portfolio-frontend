@@ -9,6 +9,7 @@ import Assets from "./pages/Assets";
 import Performance from "./pages/Performance";
 import Alerts from "./pages/Alerts";
 import Settings from "./pages/Settings";
+import AIInsights from "./pages/AIInsights";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,7 +25,9 @@ const App = () => (
           <Route path="/" element={<Dashboard />} />
           <Route path="/assets" element={<Assets />} />
           <Route path="/performance" element={<Performance />} />
+          <Route path="/analytics" element={<Performance />} />
           <Route path="/alerts" element={<Alerts />} />
+          <Route path="/ai" element={<AIInsights />} />
           <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
