@@ -65,14 +65,13 @@ export default function Dashboard() {
         </div>
 
         {/* Enhanced Stats Grid */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <StatCard
             title="Total Portfolio Value"
             value={`$${portfolioSummary.total_value.toLocaleString()}`}
             change={`$${portfolioSummary.daily_change.toLocaleString()} (${portfolioSummary.daily_change_percent.toFixed(2)}%) today`}
             changeType="positive"
             icon={Wallet}
-            trend={[85, 90, 88, 95, 92, 98, 100]}
             className="glass-card hover-lift"
           />
           <StatCard
@@ -80,7 +79,6 @@ export default function Dashboard() {
             value={`$${portfolioSummary.total_invested.toLocaleString()}`}
             icon={DollarSign}
             iconColor="bg-chart-2/10"
-            trend={[70, 75, 80, 85, 88, 90, 95]}
             className="glass-card hover-lift"
           />
           <StatCard
@@ -90,7 +88,6 @@ export default function Dashboard() {
             changeType={portfolioSummary.total_gain_loss >= 0 ? 'positive' : 'negative'}
             icon={TrendingUp}
             iconColor="bg-success/10"
-            trend={[60, 65, 70, 75, 80, 85, 87]}
             className="glass-card hover-lift"
           />
           <StatCard
@@ -100,33 +97,8 @@ export default function Dashboard() {
             changeType="neutral"
             icon={PiggyBank}
             iconColor="bg-chart-3/10"
-            trend={[8, 9, 10, 10, 11, 10, 10]}
             className="glass-card hover-lift"
           />
-        </div>
-
-        {/* AI Insights Banner */}
-        <div className="glass-card p-6 bg-gradient-to-r from-primary/10 via-chart-2/10 to-chart-3/10 border border-primary/20">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-chart-2">
-                <Brain className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                  AI Portfolio Analysis
-                  <Sparkles className="h-4 w-4 text-primary animate-pulse" />
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Your portfolio shows strong momentum. Consider rebalancing tech allocation.
-                </p>
-              </div>
-            </div>
-            <Button variant="outline" className="border-primary/30 text-primary hover:bg-primary/10">
-              View Insights
-              <ArrowUpRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
         </div>
 
         {/* Charts Section */}
