@@ -12,6 +12,7 @@ import Alerts from "./pages/Alerts";
 import Settings from "./pages/Settings";
 import AIInsights from "./pages/AIInsights";
 import NotFound from "./pages/NotFound";
+import Transactions from "./pages/Transactions";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/asset-info/:symbol" element={<AssetInformation />} />
           <Route path="/performance" element={<Performance />} />
           <Route path="/analytics" element={<Performance />} />
+          <Route path="/transactions" element={<Transactions />} />
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/ai" element={<AIInsights />} />
           <Route path="/settings" element={<Settings />} />
