@@ -1,8 +1,8 @@
 // Asset Types based on database schema
 export type AssetTypeCode = 'STOCK' | 'BOND' | 'CASH' | 'CRYPTO';
-export type AssetStatus = 'active' | 'sold' | 'watching';
+export type AssetStatus = 'OWNED' | 'WATCHLIST' | 'RESEARCH' | 'SOLD' | 'active' | 'sold' | 'watching';
 export type TransactionType = 'buy' | 'sell' | 'dividend' | 'transfer';
-export type RiskLevel = 'low' | 'medium' | 'high' | 'very_high';
+export type RiskLevel = 'low' | 'medium' | 'high' | 'very_high' | 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH';
 export type Sentiment = 'positive' | 'negative' | 'neutral';
 
 export interface AssetType {
@@ -18,34 +18,34 @@ export interface AssetType {
 
 export interface MarketData {
   id: number;
-  asset_type_id: number;
+  assetType: AssetType;
   symbol: string;
   name: string;
-  current_price: number;
-  previous_close: number;
-  day_change: number;
-  day_change_percent: number;
+  currentPrice: number;
+  previousClose: number;
+  dayChange: number;
+  dayChangePercent: number;
   volume: number;
-  day_high: number;
-  day_low: number;
-  week_52_high: number;
-  week_52_low: number;
-  market_cap: number;
-  bid_price: number;
-  ask_price: number;
+  dayHigh: number;
+  dayLow: number;
+  week52High: number;
+  week52Low: number;
+  marketCap: number;
+  bidPrice: number;
+  askPrice: number;
   sector: string;
   industry: string;
   exchange: string;
   currency: string;
-  dividend_yield: number;
-  pe_ratio: number;
+  dividendYield: number;
+  peRatio: number;
   beta: number;
   eps: number;
-  data_source: string;
-  last_updated: string;
-  market_status: string;
-  created_date: string;
-  updated_date: string;
+  dataSource: string;
+  lastUpdated: string;
+  marketStatus: string;
+  createdDate: string;
+  updatedDate: string;
 }
 
 export interface Asset {
