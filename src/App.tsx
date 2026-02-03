@@ -6,6 +6,7 @@ import { ThemeProvider } from "next-themes";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Assets from "./pages/Assets";
+import AssetInformation from "./pages/AssetInformation";
 import Performance from "./pages/Performance";
 import Alerts from "./pages/Alerts";
 import Settings from "./pages/Settings";
@@ -24,6 +25,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/assets" element={<Assets />} />
+          <Route path="/asset-info/:symbol" element={<AssetInformation />} />
           <Route path="/performance" element={<Performance />} />
           <Route path="/analytics" element={<Performance />} />
           <Route path="/alerts" element={<Alerts />} />
