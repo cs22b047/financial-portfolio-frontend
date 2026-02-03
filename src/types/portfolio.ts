@@ -91,17 +91,19 @@ export interface Transaction {
 
 export interface PriceHistory {
   id: number;
-  market_data_id: number;
-  price_date: string;
-  open_price: number;
-  high_price: number;
-  low_price: number;
-  close_price: number;
-  adjusted_close: number;
+  marketData: {
+    id: number;
+    symbol: string;
+  };
+  priceDate: string;
+  openPrice: number;
+  highPrice: number;
+  lowPrice: number;
+  closePrice: number;
+  adjustedClose: number;
   volume: number;
-  source: string;
-  created_date: string;
-  data_source: string;
+  dataSource: string;
+  createdDate: string;
 }
 
 export interface Dividend {
@@ -146,18 +148,17 @@ export interface Currency {
 
 export interface News {
   id: number;
-  market_data_id: number;
   symbol: string;
   title: string;
   summary: string;
   link: string;
-  image_url: string;
+  imageUrl: string;
   source: string;
   publisher: string;
-  published_date: string;
+  publishedDate: string;
   sentiment: Sentiment;
-  is_read: boolean;
-  created_date: string;
+  isRead: boolean;
+  createdDate: string;
 }
 
 export interface Alert {

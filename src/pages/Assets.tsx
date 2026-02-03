@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { mockAssets, assetTypes } from '@/data/mockData';
 import { Asset, AssetTypeCode, MarketData } from '@/types/portfolio';
@@ -357,6 +358,7 @@ function AddAssetDialog() {
 }
 
 export default function Assets() {
+  const navigate = useNavigate();
   const [assets, setAssets] = useState<Asset[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [assetTypeFilter, setAssetTypeFilter] = useState<string>('all');
@@ -609,7 +611,11 @@ export default function Assets() {
             </TableHeader>
             <TableBody>
               {filteredAssets.map((asset) => (
-                <TableRow key={asset.id} className="border-border hover:bg-secondary/50">
+                <TableRow 
+                  key={asset.id} 
+                  className="border-border hover:bg-secondary/50 cursor-pointer transition-colors"
+                  onClick={() => navigate(`/asset-info/${asset.symbol}`)}
+                >
                   <TableCell>
                     <div>
                       <span className="font-semibold text-foreground">{asset.symbol}</span>
