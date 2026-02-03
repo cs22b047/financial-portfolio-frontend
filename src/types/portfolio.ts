@@ -1,5 +1,5 @@
 // Asset Types based on database schema
-export type AssetTypeCode = 'STOCK' | 'BOND' | 'CASH' | 'CRYPTO';
+export type AssetTypeCode = 'STOCK' | 'ETF' | 'BOND' | 'CASH' | 'CRYPTO' | 'MUTUAL_FUND';
 export type AssetStatus = 'OWNED' | 'WATCHLIST' | 'RESEARCH' | 'SOLD' | 'active' | 'sold' | 'watching';
 export type TransactionType = 'buy' | 'sell' | 'dividend' | 'transfer';
 export type RiskLevel = 'low' | 'medium' | 'high' | 'very_high' | 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH';

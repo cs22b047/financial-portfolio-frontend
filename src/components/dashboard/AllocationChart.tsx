@@ -7,16 +7,20 @@ interface AllocationChartProps {
 
 const COLORS = {
   STOCK: 'hsl(217, 91%, 60%)',
+  ETF: 'hsl(200, 85%, 45%)',
   BOND: 'hsl(160, 84%, 39%)',
   CASH: 'hsl(38, 92%, 50%)',
   CRYPTO: 'hsl(280, 65%, 60%)',
+  MUTUAL_FUND: 'hsl(270, 70%, 55%)',
 };
 
 const TYPE_LABELS = {
   STOCK: 'Stocks',
+  ETF: 'ETFs',
   BOND: 'Bonds',
   CASH: 'Cash',
   CRYPTO: 'Crypto',
+  MUTUAL_FUND: 'Mutual Funds',
 };
 
 export function AllocationChart({ data }: AllocationChartProps) {
