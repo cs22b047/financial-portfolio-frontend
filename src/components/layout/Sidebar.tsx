@@ -40,13 +40,6 @@ const navigation = [
     gradient: 'from-orange-500 to-red-600'
   },
   { 
-    name: 'Analytics', 
-    href: '/analytics', 
-    icon: BarChart3,
-    description: 'Deep Insights',
-    gradient: 'from-purple-500 to-pink-600'
-  },
-  { 
     name: 'Alerts', 
     href: '/alerts', 
     icon: Bell,
@@ -54,10 +47,10 @@ const navigation = [
     gradient: 'from-yellow-500 to-orange-600'
   },
   { 
-    name: 'AI Insights', 
+    name: 'Insights', 
     href: '/ai', 
     icon: Sparkles,
-    description: 'AI-Powered Analysis',
+    description: 'Portfolio Insights',
     gradient: 'from-cyan-500 to-blue-600'
   },
   { 
@@ -257,9 +250,9 @@ export function Sidebar() {
                   </div>
                 )}
 
-                {item.name === 'AI Insights' && (
+                {item.name === 'Insights' && (
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 text-[10px] font-bold text-white">
-                    AI
+                    💡
                   </div>
                 )}
               </Link>

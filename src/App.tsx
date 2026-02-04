@@ -10,7 +10,7 @@ import AssetInformation from "./pages/AssetInformation";
 import Performance from "./pages/Performance";
 import Alerts from "./pages/Alerts";
 import Settings from "./pages/Settings";
-import AIInsights from "./pages/AIInsights";
+import Insights from "./pages/Insights";
 import NotFound from "./pages/NotFound";
 import Transactions from "./pages/Transactions";
 
@@ -28,10 +28,9 @@ const App = () => (
           <Route path="/assets" element={<Assets />} />
           <Route path="/asset-info/:symbol" element={<AssetInformation />} />
           <Route path="/performance" element={<Performance />} />
-          <Route path="/analytics" element={<Performance />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/alerts" element={<Alerts />} />
-          <Route path="/ai" element={<AIInsights />} />
+          <Route path="/ai" element={<Insights />} />
           <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
