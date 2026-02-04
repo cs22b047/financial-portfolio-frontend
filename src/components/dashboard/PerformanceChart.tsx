@@ -221,7 +221,8 @@ export function PerformanceChart({ data, assetTypeGainLoss = [] }: PerformanceCh
                 axisLine={false}
                 tickLine={false}
                 tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-                tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                tickFormatter={(value) => `$${(value / 1000000).toFixed(2)}M`}
+                domain={['dataMin - 100000', 'dataMax + 100000']}
                 dx={-10}
               />
               
@@ -267,6 +268,7 @@ export function PerformanceChart({ data, assetTypeGainLoss = [] }: PerformanceCh
                 tickLine={false}
                 tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
                 tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                domain={['auto', 'auto']}
                 dx={-10}
               />
               

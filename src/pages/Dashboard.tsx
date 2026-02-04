@@ -241,17 +241,16 @@ export default function Dashboard() {
       })
     );
 
-    const dateMap: Record<string, number> = {};
-    ownedAssets.forEach((asset, index) => {
-      const quantity = Number(asset.quantity || 0);
-      priceHistoryResponses[index].forEach((entry: any) => {
-        if (!entry.date) return;
-        dateMap[entry.date] = (dateMap[entry.date] || 0) + entry.close * quantity;
+    // Build a complete date range and forward-fill missing prices
+    const allDates = new Set<string>();
+    priceHistoryResponses.forEach(prices => {
+      prices.forEach((entry: any) => {
+        if (entry.date) allDates.add(entry.date);
       });
     });
 
-    const dates = Object.keys(dateMap).sort();
-    if (dates.length === 0) {
+    const sortedDates = Array.from(allDates).sort();
+    if (sortedDates.length === 0) {
       setPerformance([
         {
           date: new Date().toISOString().split('T')[0],
@@ -262,11 +261,43 @@ export default function Dashboard() {
       return;
     }
 
-    const performanceData = dates.map((date) => ({
-      date,
-      value: dateMap[date],
-      gain_loss: dateMap[date] - totalInvested,
-    }));
+    // For each asset, create a map with forward-filled prices
+    const assetPricesByDate = ownedAssets.map((asset, index) => {
+      const quantity = Number(asset.quantity || 0);
+      const currentPrice = Number(asset.currentPrice || asset.current_price || 0);
+      const prices = priceHistoryResponses[index];
+      
+      const priceMap: Record<string, number> = {};
+      let lastKnownPrice = currentPrice; // Start with current price as fallback
+
+      // Build price map from historical data
+      prices.forEach((entry: any) => {
+        if (entry.date && entry.close > 0) {
+          priceMap[entry.date] = entry.close;
+        }
+      });
+
+      // Forward fill: for each date, use the last known price if no data exists
+      const filledPrices: Record<string, number> = {};
+      sortedDates.forEach(date => {
+        if (priceMap[date]) {
+          lastKnownPrice = priceMap[date];
+        }
+        filledPrices[date] = lastKnownPrice * quantity;
+      });
+
+      return filledPrices;
+    });
+
+    // Sum all assets for each date
+    const performanceData = sortedDates.map(date => {
+      const value = assetPricesByDate.reduce((sum, assetPrices) => sum + (assetPrices[date] || 0), 0);
+      return {
+        date,
+        value,
+        gain_loss: value - totalInvested,
+      };
+    });
 
     setPerformance(performanceData);
   };
