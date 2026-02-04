@@ -4,7 +4,6 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import {
   LayoutDashboard,
   Wallet,
-  TrendingUp,
   Bell,
   Settings,
   PieChart,
@@ -27,13 +26,6 @@ const navigation = [
     icon: Wallet,
     description: 'Asset Management',
     gradient: 'from-green-500 to-emerald-600'
-  },
-  { 
-    name: 'Performance', 
-    href: '/performance', 
-    icon: TrendingUp,
-    description: 'Returns & Metrics',
-    gradient: 'from-orange-500 to-red-600'
   },
   { 
     name: 'Alerts', 
