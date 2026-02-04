@@ -1,5 +1,5 @@
 // Asset Types based on database schema
-export type AssetTypeCode = 'STOCK' | 'BOND' | 'CASH' | 'CRYPTO';
+export type AssetTypeCode = 'STOCK' | 'ETF' | 'BOND' | 'CASH' | 'CRYPTO' | 'MUTUAL_FUND';
 export type AssetStatus = 'OWNED' | 'WATCHLIST' | 'RESEARCH' | 'SOLD' | 'active' | 'sold' | 'watching';
 export type TransactionType = 'buy' | 'sell' | 'dividend' | 'transfer';
 export type RiskLevel = 'low' | 'medium' | 'high' | 'very_high' | 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH';
@@ -91,17 +91,19 @@ export interface Transaction {
 
 export interface PriceHistory {
   id: number;
-  market_data_id: number;
-  price_date: string;
-  open_price: number;
-  high_price: number;
-  low_price: number;
-  close_price: number;
-  adjusted_close: number;
+  marketData: {
+    id: number;
+    symbol: string;
+  };
+  priceDate: string;
+  openPrice: number;
+  highPrice: number;
+  lowPrice: number;
+  closePrice: number;
+  adjustedClose: number;
   volume: number;
-  source: string;
-  created_date: string;
-  data_source: string;
+  dataSource: string;
+  createdDate: string;
 }
 
 export interface Dividend {
@@ -146,33 +148,31 @@ export interface Currency {
 
 export interface News {
   id: number;
-  market_data_id: number;
   symbol: string;
   title: string;
   summary: string;
   link: string;
-  image_url: string;
+  imageUrl: string;
   source: string;
   publisher: string;
-  published_date: string;
+  publishedDate: string;
   sentiment: Sentiment;
-  is_read: boolean;
-  created_date: string;
+  isRead: boolean;
+  createdDate: string;
 }
 
 export interface Alert {
   id: number;
-  asset_id: number;
-  asset_symbol: string;
-  asset_name: string;
-  alert_type: 'price_above' | 'price_below' | 'percent_change' | 'volume_spike';
-  threshold_value: number;
-  current_value: number;
-  is_triggered: boolean;
-  triggered_at: string | null;
-  is_active: boolean;
-  created_date: string;
-  message: string;
+  asset: {
+    id: number;
+    symbol: string;
+    name: string;
+  };
+  targetPrice: number;
+  aboveOrBelow: 'ABOVE' | 'BELOW';
+  triggered: boolean;
+  createdDate: string;
+  updatedDate: string;
 }
 
 // Dashboard specific types

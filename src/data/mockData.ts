@@ -12,10 +12,11 @@ import {
 
 export const assetTypes: AssetType[] = [
   { id: 1, code: 'STOCK', name: 'Stock', description: 'Equity securities', risk_level: 'medium', is_active: true, created_date: '2024-01-01', updated_date: '2024-01-01' },
-  { id: 2, code: 'STOCK', name: 'ETF', description: 'Exchange Traded Funds', risk_level: 'medium', is_active: true, created_date: '2024-01-01', updated_date: '2024-01-01' },
+  { id: 2, code: 'ETF', name: 'ETF', description: 'Exchange Traded Funds', risk_level: 'medium', is_active: true, created_date: '2024-01-01', updated_date: '2024-01-01' },
   { id: 3, code: 'CRYPTO', name: 'Crypto', description: 'Cryptocurrency', risk_level: 'very_high', is_active: true, created_date: '2024-01-01', updated_date: '2024-01-01' },
   { id: 4, code: 'BOND', name: 'Bond', description: 'Fixed income securities', risk_level: 'low', is_active: true, created_date: '2024-01-01', updated_date: '2024-01-01' },
   { id: 5, code: 'CASH', name: 'Cash', description: 'Cash and equivalents', risk_level: 'low', is_active: true, created_date: '2024-01-01', updated_date: '2024-01-01' },
+  { id: 6, code: 'MUTUAL_FUND', name: 'Mutual Fund', description: 'Mutual fund investments', risk_level: 'medium', is_active: true, created_date: '2024-01-01', updated_date: '2024-01-01' },
 ];
 
 export const mockAssets: Asset[] = [

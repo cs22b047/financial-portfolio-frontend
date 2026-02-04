@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { mockAssets, assetTypes } from '@/data/mockData';
 import { Asset, AssetTypeCode, MarketData } from '@/types/portfolio';
@@ -198,7 +199,7 @@ function AddAssetDialog() {
           + Add Asset
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[650px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Asset</DialogTitle>
         </DialogHeader>
@@ -223,24 +224,27 @@ function AddAssetDialog() {
             </Select>
           </div>
 
-          {/* Company Symbol Dropdown */}
+          {/* Asset Symbol Dropdown */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Company</label>
+            <label className="text-sm font-medium">Asset</label>
             <Select value={formData.symbol} onValueChange={handleSymbolChange} disabled={loading}>
-              <SelectTrigger className="bg-secondary border-border">
-                <SelectValue placeholder={loading ? 'Loading...' : 'Select a company'} />
+              <SelectTrigger className="bg-secondary border-border w-full">
+                <SelectValue placeholder={loading ? 'Loading...' : 'Select an asset'} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="w-[600px]">
                 {marketDataList.map((market) => (
-                  <SelectItem key={market.id} value={market.symbol}>
-                    {market.name} ({market.symbol})
+                  <SelectItem key={market.id} value={market.symbol} className="truncate">
+                    <span className="truncate">
+                      {market.name} ({market.symbol})
+                      {market.assetType?.code ? ` • ${market.assetType.code}` : ''}
+                    </span>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          {/* Display selected company info */}
+          {/* Display selected asset info */}
           {selectedMarketData && (
             <div className="rounded-md bg-secondary/50 p-3 text-sm">
               <div className="flex justify-between">
@@ -248,8 +252,14 @@ function AddAssetDialog() {
                 <span className="font-medium">${selectedMarketData.currentPrice.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Sector:</span>
-                <span className="font-medium">{selectedMarketData.sector}</span>
+                <span className="text-muted-foreground">Type:</span>
+                <span className="font-medium">{selectedMarketData.assetType?.name || selectedMarketData.assetType?.code || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Sector/Category:</span>
+                <span className="font-medium">
+                  {selectedMarketData.sector || selectedMarketData.industry || 'N/A'}
+                </span>
               </div>
             </div>
           )}
@@ -319,7 +329,7 @@ function AddAssetDialog() {
                   className="bg-secondary border-border"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Set a target price to get alerts when the stock reaches this level.
+                  Set a target price to get alerts when the asset reaches this level.
                 </p>
               </div>
             </>
@@ -357,6 +367,7 @@ function AddAssetDialog() {
 }
 
 export default function Assets() {
+  const navigate = useNavigate();
   const [assets, setAssets] = useState<Asset[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [assetTypeFilter, setAssetTypeFilter] = useState<string>('all');
@@ -486,9 +497,11 @@ export default function Assets() {
 
   const TYPE_COLORS = {
     STOCK: 'bg-chart-2/20 text-chart-2',
+    ETF: 'bg-primary/20 text-primary',
     BOND: 'bg-success/20 text-success',
     CASH: 'bg-warning/20 text-warning',
     CRYPTO: 'bg-chart-3/20 text-chart-3',
+    MUTUAL_FUND: 'bg-purple-500/20 text-purple-400',
   };
 
   return (
@@ -536,10 +549,11 @@ export default function Assets() {
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="STOCK">Stock</SelectItem>
-              <SelectItem value="STOCK">ETF</SelectItem>
+              <SelectItem value="ETF">ETF</SelectItem>
               <SelectItem value="CRYPTO">Crypto</SelectItem>
               <SelectItem value="BOND">Bond</SelectItem>
               <SelectItem value="CASH">Cash</SelectItem>
+              <SelectItem value="MUTUAL_FUND">Mutual Fund</SelectItem>
             </SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -609,7 +623,11 @@ export default function Assets() {
             </TableHeader>
             <TableBody>
               {filteredAssets.map((asset) => (
-                <TableRow key={asset.id} className="border-border hover:bg-secondary/50">
+                <TableRow 
+                  key={asset.id} 
+                  className="border-border hover:bg-secondary/50 cursor-pointer transition-colors"
+                  onClick={() => navigate(`/asset-info/${asset.symbol}`)}
+                >
                   <TableCell>
                     <div>
                       <span className="font-semibold text-foreground">{asset.symbol}</span>

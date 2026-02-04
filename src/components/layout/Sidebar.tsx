@@ -11,7 +11,7 @@ import {
   ChevronRight,
   MessageSquare,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const navigation = [
   { 
@@ -61,6 +61,68 @@ const navigation = [
 export function Sidebar() {
   const location = useLocation();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [totalValue, setTotalValue] = useState(0);
+  const [todayPL, setTodayPL] = useState(0);
+  const [todayPLPercent, setTodayPLPercent] = useState(0);
+  const [totalGainLossPercent, setTotalGainLossPercent] = useState(0);
+
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
+  const formatCurrency = (value: number) => `$${Math.abs(value).toLocaleString()}`;
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchSidebarStats = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/api/assets`, { signal: controller.signal });
+        if (!response.ok) return;
+        const assetsData = await response.json();
+
+        const ownedAssets = assetsData.filter((asset: any) => asset.status === 'OWNED');
+        let total = 0;
+        let today = 0;
+        let prevTotal = 0;
+        let totalInvested = 0;
+
+        ownedAssets.forEach((asset: any) => {
+          const quantity = Number(asset.quantity || 0);
+          const currentPrice = Number(
+            asset.currentPrice ?? asset.current_price ?? asset.marketData?.currentPrice ?? asset.market_data?.current_price ?? 0
+          );
+          const dayChange = Number(
+            asset.dayChange ?? asset.day_change ?? asset.marketData?.dayChange ?? asset.market_data?.day_change ?? 0
+          );
+          const previousClose = Number(
+            asset.previousClose ?? asset.previous_close ?? asset.marketData?.previousClose ?? asset.market_data?.previous_close ??
+              (currentPrice - dayChange)
+          );
+
+          const change = dayChange || (currentPrice - previousClose);
+          total += quantity * currentPrice;
+          today += quantity * change;
+          prevTotal += quantity * (previousClose || (currentPrice - change));
+          totalInvested += quantity * Number(asset.purchasePrice ?? asset.purchase_price ?? 0);
+        });
+
+        const percent = prevTotal > 0 ? (today / prevTotal) * 100 : 0;
+        const totalPercent = totalInvested > 0 ? ((total - totalInvested) / totalInvested) * 100 : 0;
+
+        setTotalValue(total);
+        setTodayPL(today);
+        setTodayPLPercent(percent);
+        setTotalGainLossPercent(totalPercent);
+      } catch (error) {
+        if ((error as { name?: string })?.name === 'AbortError') return;
+      }
+    };
+
+    fetchSidebarStats();
+
+    return () => {
+      controller.abort();
+    };
+  }, [apiUrl]);
 
   return (
     <aside className="fixed left-0 top-0 z-50 h-screen w-72 glass-card border-r border-border/50">
@@ -88,13 +150,33 @@ export function Sidebar() {
           <div className="grid grid-cols-2 gap-3">
             <div className="glass rounded-lg p-3">
               <div className="text-xs text-muted-foreground">Total Value</div>
-              <div className="text-sm font-bold text-success">$113.2K</div>
-              <div className="text-xs text-success">+2.4%</div>
+              <div className={cn(
+                'text-sm font-bold',
+                totalValue >= 0 ? 'text-success' : 'text-destructive'
+              )}>
+                {formatCurrency(totalValue)}
+              </div>
+              <div className={cn(
+                'text-xs',
+                totalGainLossPercent >= 0 ? 'text-success' : 'text-destructive'
+              )}>
+                {totalGainLossPercent >= 0 ? '+' : ''}{totalGainLossPercent.toFixed(2)}%
+              </div>
             </div>
             <div className="glass rounded-lg p-3">
               <div className="text-xs text-muted-foreground">Today</div>
-              <div className="text-sm font-bold text-primary">+$1.2K</div>
-              <div className="text-xs text-primary">+1.1%</div>
+              <div className={cn(
+                'text-sm font-bold',
+                todayPL >= 0 ? 'text-success' : 'text-destructive'
+              )}>
+                {todayPL >= 0 ? '+' : ''}{formatCurrency(todayPL)}
+              </div>
+              <div className={cn(
+                'text-xs',
+                todayPLPercent >= 0 ? 'text-success' : 'text-destructive'
+              )}>
+                {todayPLPercent >= 0 ? '+' : ''}{todayPLPercent.toFixed(2)}%
+              </div>
             </div>
           </div>
         </div>

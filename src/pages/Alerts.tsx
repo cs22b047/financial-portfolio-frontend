@@ -1,53 +1,172 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { mockAlerts } from '@/data/mockData';
-import { Alert } from '@/types/portfolio';
+import { Alert, Asset } from '@/types/portfolio';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import {
   Bell,
   BellOff,
   TrendingUp,
   TrendingDown,
   AlertTriangle,
-  Activity,
   Plus,
   Check,
   X,
+  Trash2,
 } from 'lucide-react';
 import { format } from 'date-fns';
 
 const alertTypeIcons = {
-  price_above: TrendingUp,
-  price_below: TrendingDown,
-  percent_change: Activity,
-  volume_spike: AlertTriangle,
+  ABOVE: TrendingUp,
+  BELOW: TrendingDown,
 };
 
 const alertTypeLabels = {
-  price_above: 'Price Above',
-  price_below: 'Price Below',
-  percent_change: 'Percent Change',
-  volume_spike: 'Volume Spike',
+  ABOVE: 'Price Above',
+  BELOW: 'Price Below',
 };
 
 export default function Alerts() {
-  const [alerts, setAlerts] = useState<Alert[]>(mockAlerts);
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Form state
+  const [selectedAssetId, setSelectedAssetId] = useState<string>('');
+  const [targetPrice, setTargetPrice] = useState<string>('');
+  const [direction, setDirection] = useState<'ABOVE' | 'BELOW'>('ABOVE');
 
-  const toggleAlert = (id: number) => {
-    setAlerts(alerts.map(alert =>
-      alert.id === id ? { ...alert, is_active: !alert.is_active } : alert
-    ));
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
+  useEffect(() => {
+    fetchAlerts();
+    fetchAssets();
+  }, []);
+
+  const fetchAlerts = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/alerts`);
+      if (response.ok) {
+        const data = await response.json();
+        setAlerts(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch alerts:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const dismissAlert = (id: number) => {
-    setAlerts(alerts.filter(alert => alert.id !== id));
+  const fetchAssets = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/assets`);
+      if (response.ok) {
+        const data = await response.json();
+        setAssets(data.filter((a: Asset) => a.status === 'OWNED'));
+      }
+    } catch (err) {
+      console.error('Failed to fetch assets:', err);
+    }
   };
 
-  const activeAlerts = alerts.filter(a => a.is_active);
-  const triggeredAlerts = alerts.filter(a => a.is_triggered);
+  const handleCreateAlert = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`${apiUrl}/api/alerts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          assetId: parseInt(selectedAssetId),
+          targetPrice: parseFloat(targetPrice),
+          aboveOrBelow: direction,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create alert');
+      }
+
+      // Reset form and close dialog
+      setSelectedAssetId('');
+      setTargetPrice('');
+      setDirection('ABOVE');
+      setDialogOpen(false);
+      
+      // Refresh alerts
+      fetchAlerts();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const deleteAlert = async (id: number) => {
+    try {
+      const response = await fetch(`${apiUrl}/api/alerts/${id}`, {
+        method: 'DELETE',
+      });
+      
+      if (response.ok) {
+        setAlerts(alerts.filter(alert => alert.id !== id));
+      }
+    } catch (err) {
+      console.error('Failed to delete alert:', err);
+    }
+  };
+
+  const resetAlert = async (id: number) => {
+    try {
+      const response = await fetch(`${apiUrl}/api/alerts/${id}/reset`, {
+        method: 'PATCH',
+      });
+      
+      if (response.ok) {
+        const updated = await response.json();
+        setAlerts(alerts.map(alert => alert.id === id ? updated : alert));
+      }
+    } catch (err) {
+      console.error('Failed to reset alert:', err);
+    }
+  };
+
+  const activeAlerts = alerts.filter(a => !a.triggered);
+  const triggeredAlerts = alerts.filter(a => a.triggered);
+
+  if (loading) {
+    return (
+      <MainLayout>
+        <div className="flex items-center justify-center py-12">
+          <p className="text-muted-foreground">Loading alerts...</p>
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
@@ -58,7 +177,7 @@ export default function Alerts() {
             <h1 className="text-2xl font-bold text-foreground">Price Alerts</h1>
             <p className="text-muted-foreground">Monitor your assets with custom alerts</p>
           </div>
-          <Button className="bg-primary hover:bg-primary/90">
+          <Button className="bg-primary hover:bg-primary/90" onClick={() => setDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Create Alert
           </Button>
@@ -122,27 +241,37 @@ export default function Alerts() {
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-foreground">{alert.asset_symbol}</span>
+                        <span className="font-semibold text-foreground">{alert.asset.symbol}</span>
                         <Badge variant="outline" className="text-warning border-warning/30">
                           Triggered
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground">{alert.message}</p>
-                      {alert.triggered_at && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Triggered: {format(new Date(alert.triggered_at), 'MMM d, yyyy h:mm a')}
-                        </p>
-                      )}
+                      <p className="text-sm text-muted-foreground">
+                        {alertTypeLabels[alert.aboveOrBelow]}: ${alert.targetPrice.toFixed(2)}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {format(new Date(alert.updatedDate), 'MMM d, yyyy h:mm a')}
+                      </p>
                     </div>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => dismissAlert(alert.id)}
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => resetAlert(alert.id)}
+                      className="text-xs"
+                    >
+                      Reset
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => deleteAlert(alert.id)}
+                      className="text-muted-foreground hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -156,66 +285,156 @@ export default function Alerts() {
             <p className="text-sm text-muted-foreground">Manage your price alerts</p>
           </div>
           <div className="divide-y divide-border">
-            {alerts.map((alert) => {
-              const Icon = alertTypeIcons[alert.alert_type];
-              return (
-                <div
-                  key={alert.id}
-                  className={cn(
-                    'flex items-center justify-between p-5 transition-colors',
-                    !alert.is_active && 'opacity-50'
-                  )}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={cn(
-                      'flex h-12 w-12 items-center justify-center rounded-xl',
-                      alert.alert_type === 'price_above' && 'bg-success/10',
-                      alert.alert_type === 'price_below' && 'bg-destructive/10',
-                      alert.alert_type === 'percent_change' && 'bg-chart-2/10',
-                      alert.alert_type === 'volume_spike' && 'bg-warning/10'
-                    )}>
-                      <Icon className={cn(
-                        'h-5 w-5',
-                        alert.alert_type === 'price_above' && 'text-success',
-                        alert.alert_type === 'price_below' && 'text-destructive',
-                        alert.alert_type === 'percent_change' && 'text-chart-2',
-                        alert.alert_type === 'volume_spike' && 'text-warning'
-                      )} />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-foreground">{alert.asset_symbol}</span>
-                        <span className="text-sm text-muted-foreground">{alert.asset_name}</span>
+            {alerts.length === 0 ? (
+              <div className="p-12 text-center">
+                <Bell className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">No alerts yet. Create your first alert to get started.</p>
+              </div>
+            ) : (
+              alerts.map((alert) => {
+                const Icon = alertTypeIcons[alert.aboveOrBelow];
+                return (
+                  <div
+                    key={alert.id}
+                    className="flex items-center justify-between p-5 transition-colors"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={cn(
+                        'flex h-12 w-12 items-center justify-center rounded-xl',
+                        alert.aboveOrBelow === 'ABOVE' && 'bg-success/10',
+                        alert.aboveOrBelow === 'BELOW' && 'bg-destructive/10'
+                      )}>
+                        <Icon className={cn(
+                          'h-5 w-5',
+                          alert.aboveOrBelow === 'ABOVE' && 'text-success',
+                          alert.aboveOrBelow === 'BELOW' && 'text-destructive'
+                        )} />
                       </div>
-                      <p className="text-sm text-muted-foreground mt-0.5">
-                        {alertTypeLabels[alert.alert_type]}: ${alert.threshold_value.toLocaleString()}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Current: ${alert.current_value.toLocaleString()}
-                      </p>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-foreground">{alert.asset.symbol}</span>
+                          <span className="text-sm text-muted-foreground">{alert.asset.name}</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-0.5">
+                          {alertTypeLabels[alert.aboveOrBelow]}: ${alert.targetPrice.toFixed(2)}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Created: {format(new Date(alert.createdDate), 'MMM d, yyyy')}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <Badge
+                        variant={alert.triggered ? 'default' : 'outline'}
+                        className={cn(
+                          alert.triggered
+                            ? 'bg-warning text-warning-foreground'
+                            : 'text-muted-foreground'
+                        )}
+                      >
+                        {alert.triggered ? 'Triggered' : 'Watching'}
+                      </Badge>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => deleteAlert(alert.id)}
+                        className="text-muted-foreground hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <Badge
-                      variant={alert.is_triggered ? 'default' : 'outline'}
-                      className={cn(
-                        alert.is_triggered
-                          ? 'bg-warning text-warning-foreground'
-                          : 'text-muted-foreground'
-                      )}
-                    >
-                      {alert.is_triggered ? 'Triggered' : 'Watching'}
-                    </Badge>
-                    <Switch
-                      checked={alert.is_active}
-                      onCheckedChange={() => toggleAlert(alert.id)}
-                    />
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </div>
+
+        {/* Create Alert Dialog */}
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Create Price Alert</DialogTitle>
+              <DialogDescription>
+                Set up a price alert for your assets. You'll be notified when the price reaches your target.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleCreateAlert} className="space-y-4 mt-4">
+              {error && (
+                <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+                  {error}
+                </div>
+              )}
+              
+              <div className="space-y-2">
+                <Label htmlFor="asset">Asset</Label>
+                <Select value={selectedAssetId} onValueChange={setSelectedAssetId} required>
+                  <SelectTrigger id="asset">
+                    <SelectValue placeholder="Select an asset" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {assets.map((asset) => (
+                      <SelectItem key={asset.id} value={asset.id.toString()}>
+                        {asset.symbol} - {asset.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="targetPrice">Target Price ($)</Label>
+                <Input
+                  id="targetPrice"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="Enter target price"
+                  value={targetPrice}
+                  onChange={(e) => setTargetPrice(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="direction">Alert When Price Goes</Label>
+                <Select value={direction} onValueChange={(v) => setDirection(v as 'ABOVE' | 'BELOW')}>
+                  <SelectTrigger id="direction">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ABOVE">
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-success" />
+                        Above Target
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="BELOW">
+                      <div className="flex items-center gap-2">
+                        <TrendingDown className="h-4 w-4 text-destructive" />
+                        Below Target
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex justify-end gap-2 mt-6">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setDialogOpen(false)}
+                  disabled={submitting}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={submitting}>
+                  {submitting ? 'Creating...' : 'Create Alert'}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </MainLayout>
   );
