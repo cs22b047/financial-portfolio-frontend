@@ -8,12 +8,8 @@ import {
   Bell,
   Settings,
   PieChart,
-  Activity,
-  Target,
-  Zap,
-  BarChart3,
-  Sparkles,
   ChevronRight,
+  Sparkles,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -60,12 +56,6 @@ const navigation = [
     description: 'Preferences',
     gradient: 'from-gray-500 to-slate-600'
   },
-];
-
-const quickActions = [
-  { name: 'Quick Trade', icon: Zap, color: 'text-yellow-400' },
-  { name: 'Portfolio Scan', icon: Activity, color: 'text-green-400' },
-  { name: 'Set Target', icon: Target, color: 'text-blue-400' },
 ];
 
 export function Sidebar() {
@@ -259,24 +249,6 @@ export function Sidebar() {
             );
           })}
         </nav>
-
-        {/* Quick Actions */}
-        <div className="px-4 py-4 border-t border-border/30">
-          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-            Quick Actions
-          </h3>
-          <div className="grid grid-cols-3 gap-2">
-            {quickActions.map((action) => (
-              <button
-                key={action.name}
-                className="flex flex-col items-center gap-1 p-3 rounded-lg glass hover:bg-primary/10 transition-all duration-300 interactive"
-              >
-                <action.icon className={cn('h-4 w-4', action.color)} />
-                <span className="text-[10px] text-muted-foreground">{action.name}</span>
-              </button>
-            ))}
-          </div>
-        </div>
 
         {/* User Section */}
         <div className="border-t border-border/30 p-4">

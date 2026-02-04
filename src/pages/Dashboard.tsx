@@ -83,12 +83,12 @@ export default function Dashboard() {
 
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-  const formatCurrency = (value: number) => `$${value.toLocaleString()}`;
+  const formatCurrency = (value: number) => `${value.toLocaleString()}`;
 
   const mapAssetTypeCode = (asset: any) => {
     if (asset.assetType?.code) return asset.assetType.code;
     const typeId = asset.assetType?.id || asset.asset_type_id;
-    return assetTypes.find((t) => t.id === typeId)?.code || 'STOCK';
+    return assetTypes.find((t: any) => t.id === typeId)?.code || 'STOCK';
   };
 
   const computeSummary = (assets: any[]) => {
@@ -321,7 +321,7 @@ export default function Dashboard() {
         setAssetTypeGainLoss(computeAssetTypeGainLoss(assetsData));
         await buildPerformanceHistory(assetsData, summaryData.total_invested, summaryData.total_value);
 
-        const ownedAssets = assetsData.filter((asset) => asset.status === 'OWNED');
+        const ownedAssets = assetsData.filter((asset: any) => asset.status === 'OWNED');
         const firstMarketData = ownedAssets[0]?.marketData;
         if (firstMarketData?.marketStatus) setMarketStatus(firstMarketData.marketStatus);
         if (firstMarketData?.lastUpdated || firstMarketData?.updatedDate) {
@@ -381,7 +381,6 @@ export default function Dashboard() {
               <p className="text-sm text-destructive">{error}</p>
             )}
           </div>
-          <div className="flex items-center gap-3" />
         </div>
 
         {/* Enhanced Stats Grid */}
