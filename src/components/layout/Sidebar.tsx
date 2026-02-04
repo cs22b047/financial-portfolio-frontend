@@ -9,6 +9,7 @@ import {
   PieChart,
   ChevronRight,
   Sparkles,
+  MessageSquare,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -26,6 +27,13 @@ const navigation = [
     icon: Wallet,
     description: 'Asset Management',
     gradient: 'from-green-500 to-emerald-600'
+  },
+  { 
+    name: 'Conversational Agent', 
+    href: '/chat', 
+    icon: MessageSquare,
+    description: 'Smart Chat Bot',
+    gradient: 'from-purple-500 to-pink-600'
   },
   { 
     name: 'Alerts', 

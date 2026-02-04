@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Assets from "./pages/Assets";
 import AssetInformation from "./pages/AssetInformation";
+import Chat from "./pages/Chat";
 import Alerts from "./pages/Alerts";
 import Settings from "./pages/Settings";
 import Insights from "./pages/Insights";
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/" element={<Dashboard />} />
           <Route path="/assets" element={<Assets />} />
           <Route path="/asset-info/:symbol" element={<AssetInformation />} />
+          <Route path="/chat" element={<Chat />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/ai" element={<Insights />} />
