@@ -1,12 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { userSettings } from '@/data/mockData';
-import { UserSettings } from '@/types/portfolio';
+import { useSettings } from '@/context/SettingsContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
 import {
   Select,
   SelectContent,
@@ -17,25 +14,63 @@ import {
 import {
   User,
   Globe,
-  Bell,
-  Shield,
   Palette,
   Save,
   RefreshCw,
+  Wallet,
+  DollarSign,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Settings() {
-  const [settings, setSettings] = useState<UserSettings>(userSettings);
+  const { settings, loading, updateSettings } = useSettings();
   const [isSaving, setIsSaving] = useState(false);
+  
+  // Local form state
+  const [formData, setFormData] = useState({
+    userName: '',
+    currency: 'USD',
+    defaultCurrency: 'USD',
+    theme: 'dark',
+    timeZone: 'America/New_York',
+    wallet: 0,
+  });
+
+  // Update form when settings load
+  useEffect(() => {
+    if (settings) {
+      setFormData({
+        userName: settings.userName || '',
+        currency: settings.currency || 'USD',
+        defaultCurrency: settings.defaultCurrency || 'USD',
+        theme: settings.theme || 'dark',
+        timeZone: settings.timeZone || 'America/New_York',
+        wallet: settings.wallet || 0,
+      });
+    }
+  }, [settings]);
 
   const handleSave = async () => {
     setIsSaving(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsSaving(false);
-    toast.success('Settings saved successfully');
+    try {
+      await updateSettings(formData);
+      toast.success('Settings saved successfully');
+    } catch (error) {
+      toast.error('Failed to save settings');
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <MainLayout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <RefreshCw className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
@@ -68,26 +103,47 @@ export default function Settings() {
             </div>
           </div>
           <div className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="name">Display Name</Label>
+            <div className="space-y-2">
+              <Label htmlFor="name">Display Name</Label>
+              <Input
+                id="name"
+                value={formData.userName}
+                onChange={(e) => setFormData({ ...formData, userName: e.target.value })}
+                className="bg-secondary border-border"
+                placeholder="Enter your name"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Wallet Section */}
+        <div className="rounded-xl bg-card border border-border/50 p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-success/10">
+              <Wallet className="h-5 w-5 text-success" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground">Wallet</h3>
+              <p className="text-sm text-muted-foreground">Available funds for trading</p>
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="wallet">Current Balance</Label>
+              <div className="relative">
+                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  id="name"
-                  value={settings.user_name}
-                  onChange={(e) => setSettings({ ...settings, user_name: e.target.value })}
-                  className="bg-secondary border-border"
+                  id="wallet"
+                  type="number"
+                  step="0.01"
+                  value={formData.wallet}
+                  onChange={(e) => setFormData({ ...formData, wallet: parseFloat(e.target.value) || 0 })}
+                  className="bg-secondary border-border pl-9"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value="john.doe@example.com"
-                  disabled
-                  className="bg-secondary/50 border-border"
-                />
-              </div>
+              <p className="text-xs text-muted-foreground">
+                Available balance: ${formData.wallet.toLocaleString()}
+              </p>
             </div>
           </div>
         </div>
@@ -105,10 +161,10 @@ export default function Settings() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label>Default Currency</Label>
+              <Label>Currency</Label>
               <Select
-                value={settings.default_currency}
-                onValueChange={(value) => setSettings({ ...settings, default_currency: value })}
+                value={formData.currency}
+                onValueChange={(value) => setFormData({ ...formData, currency: value })}
               >
                 <SelectTrigger className="bg-secondary border-border">
                   <SelectValue />
@@ -118,14 +174,33 @@ export default function Settings() {
                   <SelectItem value="EUR">EUR - Euro</SelectItem>
                   <SelectItem value="GBP">GBP - British Pound</SelectItem>
                   <SelectItem value="JPY">JPY - Japanese Yen</SelectItem>
+                  <SelectItem value="INR">INR - Indian Rupee</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
+              <Label>Default Currency</Label>
+              <Select
+                value={formData.defaultCurrency}
+                onValueChange={(value) => setFormData({ ...formData, defaultCurrency: value })}
+              >
+                <SelectTrigger className="bg-secondary border-border">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="USD">USD - US Dollar</SelectItem>
+                  <SelectItem value="EUR">EUR - Euro</SelectItem>
+                  <SelectItem value="GBP">GBP - British Pound</SelectItem>
+                  <SelectItem value="JPY">JPY - Japanese Yen</SelectItem>
+                  <SelectItem value="INR">INR - Indian Rupee</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2 sm:col-span-2">
               <Label>Timezone</Label>
               <Select
-                value={settings.timezone}
-                onValueChange={(value) => setSettings({ ...settings, timezone: value })}
+                value={formData.timeZone}
+                onValueChange={(value) => setFormData({ ...formData, timeZone: value })}
               >
                 <SelectTrigger className="bg-secondary border-border">
                   <SelectValue />
@@ -136,80 +211,13 @@ export default function Settings() {
                   <SelectItem value="America/Denver">Mountain Time (MT)</SelectItem>
                   <SelectItem value="America/Los_Angeles">Pacific Time (PT)</SelectItem>
                   <SelectItem value="Europe/London">London (GMT)</SelectItem>
+                  <SelectItem value="Europe/Paris">Paris (CET)</SelectItem>
+                  <SelectItem value="Asia/Tokyo">Tokyo (JST)</SelectItem>
+                  <SelectItem value="Asia/Hong_Kong">Hong Kong (HKT)</SelectItem>
+                  <SelectItem value="Asia/Kolkata">Mumbai (IST)</SelectItem>
+                  <SelectItem value="UTC">UTC</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Date Format</Label>
-              <Select
-                value={settings.date_format}
-                onValueChange={(value) => setSettings({ ...settings, date_format: value })}
-              >
-                <SelectTrigger className="bg-secondary border-border">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
-                  <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
-                  <SelectItem value="YYYY-MM-DD">YYYY-MM-DD</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Decimal Places</Label>
-              <Select
-                value={String(settings.decimal_places)}
-                onValueChange={(value) => setSettings({ ...settings, decimal_places: parseInt(value) })}
-              >
-                <SelectTrigger className="bg-secondary border-border">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="0">0</SelectItem>
-                  <SelectItem value="2">2</SelectItem>
-                  <SelectItem value="4">4</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-
-        {/* Notifications */}
-        <div className="rounded-xl bg-card border border-border/50 p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-warning/10">
-              <Bell className="h-5 w-5 text-warning" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-foreground">Notifications</h3>
-              <p className="text-sm text-muted-foreground">Manage your notification preferences</p>
-            </div>
-          </div>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-foreground">Push Notifications</p>
-                <p className="text-sm text-muted-foreground">Receive notifications on your device</p>
-              </div>
-              <Switch
-                checked={settings.notifications_enabled}
-                onCheckedChange={(checked) =>
-                  setSettings({ ...settings, notifications_enabled: checked })
-                }
-              />
-            </div>
-            <Separator className="bg-border" />
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-foreground">Price Alerts</p>
-                <p className="text-sm text-muted-foreground">Get notified when prices hit your targets</p>
-              </div>
-              <Switch
-                checked={settings.price_alerts_enabled}
-                onCheckedChange={(checked) =>
-                  setSettings({ ...settings, price_alerts_enabled: checked })
-                }
-              />
             </div>
           </div>
         </div>
@@ -228,8 +236,8 @@ export default function Settings() {
           <div className="space-y-2">
             <Label>Theme</Label>
             <Select
-              value={settings.theme}
-              onValueChange={(value) => setSettings({ ...settings, theme: value })}
+              value={formData.theme}
+              onValueChange={(value) => setFormData({ ...formData, theme: value })}
             >
               <SelectTrigger className="w-[200px] bg-secondary border-border">
                 <SelectValue />
@@ -240,33 +248,9 @@ export default function Settings() {
                 <SelectItem value="system">System</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-        </div>
-
-        {/* Security */}
-        <div className="rounded-xl bg-card border border-border/50 p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-destructive/10">
-              <Shield className="h-5 w-5 text-destructive" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-foreground">Security</h3>
-              <p className="text-sm text-muted-foreground">Manage your account security</p>
-            </div>
-          </div>
-          <div className="space-y-4">
-            <Button variant="outline" className="border-border">
-              Change Password
-            </Button>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-foreground">Two-Factor Authentication</p>
-                <p className="text-sm text-muted-foreground">Add an extra layer of security</p>
-              </div>
-              <Button variant="outline" size="sm" className="border-border">
-                Enable
-              </Button>
-            </div>
+            <p className="text-xs text-muted-foreground">
+              Changes take effect immediately after saving
+            </p>
           </div>
         </div>
       </div>

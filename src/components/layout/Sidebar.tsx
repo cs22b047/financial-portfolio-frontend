@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { useSettings } from '@/context/SettingsContext';
 import {
   LayoutDashboard,
   Wallet,
@@ -60,6 +61,7 @@ const navigation = [
 
 export function Sidebar() {
   const location = useLocation();
+  const { settings } = useSettings();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [totalValue, setTotalValue] = useState(0);
   const [todayPL, setTodayPL] = useState(0);
@@ -69,6 +71,16 @@ export function Sidebar() {
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
   const formatCurrency = (value: number) => `$${Math.abs(value).toLocaleString()}`;
+
+  // Get user initials from settings
+  const getUserInitials = () => {
+    if (!settings?.userName) return 'JD';
+    const names = settings.userName.split(' ');
+    if (names.length >= 2) {
+      return `${names[0][0]}${names[1][0]}`.toUpperCase();
+    }
+    return settings.userName.substring(0, 2).toUpperCase();
+  };
 
   useEffect(() => {
     const controller = new AbortController();
@@ -255,12 +267,14 @@ export function Sidebar() {
           <div className="flex items-center gap-3">
             <div className="relative">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-gray-800 text-sm font-bold text-white shadow-lg">
-                JD
+                {getUserInitials()}
               </div>
               <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-gray-400 rounded-full border-2 border-background" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-sidebar-foreground truncate">John Doe</p>
+              <p className="text-sm font-semibold text-sidebar-foreground truncate">
+                {settings?.userName || 'John Doe'}
+              </p>
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 bg-primary rounded-full animate-pulse" />
                 <p className="text-xs text-muted-foreground">Pro Trader</p>

@@ -4,6 +4,7 @@ import { StatCard } from '@/components/dashboard/StatCard';
 import { PerformanceChart } from '@/components/dashboard/PerformanceChart';
 import { AllocationChart } from '@/components/dashboard/AllocationChart';
 import { TopPerformers } from '@/components/dashboard/TopPerformers';
+import { useSettings } from '@/context/SettingsContext';
 import { assetTypes } from '@/data/mockData';
 import type {
   AssetAllocation,
@@ -63,6 +64,7 @@ interface AssetTypeGainLoss {
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { settings } = useSettings();
   const [summary, setSummary] = useState<PortfolioSummary>({
     total_value: 0,
     total_invested: 0,
@@ -392,7 +394,9 @@ export default function Dashboard() {
         <div className="flex items-center justify-between">
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <h1 className="text-4xl font-bold text-gradient">Portfolio Dashboard</h1>
+              <h1 className="text-4xl font-bold text-gradient">
+                {settings?.userName ? `${settings.userName}'s Portfolio` : 'Portfolio Dashboard'}
+              </h1>
               <Badge variant="outline" className={marketStatusBadgeClass}>
                 <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse" />
                 {marketStatus}
