@@ -79,12 +79,12 @@ export default function Insights() {
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'
         }`}>
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent animate-pulse">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 via-black to-gray-600 bg-clip-text text-transparent animate-pulse">
               Portfolio Insights
             </h1>
             <p className="text-muted-foreground mt-1">Simple overview of your investments</p>
           </div>
-          <Button className="bg-gradient-to-r from-primary to-red-600 hover:from-primary/90 hover:to-red-600/90 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
+          <Button className="bg-gradient-to-r from-primary to-gray-800 hover:from-primary/90 hover:to-gray-800/90 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
             <Eye className="mr-2 h-4 w-4" />
             View Details
           </Button>
@@ -171,8 +171,8 @@ export default function Insights() {
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
           }`} style={{ transitionDelay: '300ms' }}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-red-500/20 animate-pulse">
-                <Target className="h-6 w-6 text-red-500" />
+              <div className="p-2 rounded-lg bg-primary/20 animate-pulse">
+                <Target className="h-6 w-6 text-primary" />
               </div>
               <h3 className="text-lg font-semibold text-foreground">Goal Progress</h3>
             </div>
@@ -192,7 +192,7 @@ export default function Insights() {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Progress</span>
-                  <span className="text-red-500 transition-all duration-300">
+                  <span className="text-primary transition-all duration-300">
                     {Math.round(goalProgress)}%
                   </span>
                 </div>

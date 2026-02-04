@@ -7,10 +7,10 @@ interface TopPerformersProps {
 }
 
 const TYPE_COLORS = {
-  STOCK: 'bg-red-500/20 text-red-600',
+  STOCK: 'bg-gray-800/20 text-gray-800',
   BOND: 'bg-success/20 text-success',
   CASH: 'bg-warning/20 text-warning',
-  CRYPTO: 'bg-red-400/20 text-red-500',
+  CRYPTO: 'bg-gray-600/20 text-gray-600',
 };
 
 export function TopPerformers({ data }: TopPerformersProps) {

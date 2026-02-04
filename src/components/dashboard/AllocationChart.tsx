@@ -6,12 +6,12 @@ interface AllocationChartProps {
 }
 
 const COLORS = {
-  STOCK: 'hsl(0, 84%, 60%)',
-  ETF: 'hsl(0, 72%, 50%)',
+  STOCK: 'hsl(0, 0%, 9%)',
+  ETF: 'hsl(0, 0%, 20%)',
   BOND: 'hsl(120, 100%, 25%)',
   CASH: 'hsl(38, 92%, 50%)',
-  CRYPTO: 'hsl(0, 100%, 67%)',
-  MUTUAL_FUND: 'hsl(0, 93%, 73%)',
+  CRYPTO: 'hsl(0, 0%, 30%)',
+  MUTUAL_FUND: 'hsl(0, 0%, 40%)',
 };
 
 const TYPE_LABELS = {

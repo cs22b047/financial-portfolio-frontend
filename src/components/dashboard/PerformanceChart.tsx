@@ -24,10 +24,10 @@ const timeRanges = ['1D', '1W', '1M', '3M', '6M', '1Y', 'ALL'];
 const assetTypeColors: Record<string, string> = {
   STOCK: 'hsl(var(--primary))',
   BOND: 'hsl(var(--success))',
-  CRYPTO: 'hsl(0 72% 50%)',
-  ETF: 'hsl(0 100% 67%)',
-  MUTUAL_FUND: 'hsl(0 93% 73%)',
-  COMMODITY: 'hsl(0 100% 80%)',
+  CRYPTO: 'hsl(0 0% 20%)',
+  ETF: 'hsl(0 0% 30%)',
+  MUTUAL_FUND: 'hsl(0 0% 40%)',
+  COMMODITY: 'hsl(0 0% 50%)',
 };
 
 export function PerformanceChart({ data, assetTypeGainLoss = [] }: PerformanceChartProps) {

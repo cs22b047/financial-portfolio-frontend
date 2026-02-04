@@ -16,7 +16,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
 
-    --primary: 0 84% 60%;
+    --primary: 0 0% 9%;
     --primary-foreground: 0 0% 98%;
 
     --secondary: 0 0% 96.1%;
@@ -39,43 +39,43 @@
 
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
-    --ring: 0 84% 60%;
+    --ring: 0 0% 9%;
 
     --radius: 0.5rem;
 
-    --chart-1: 0 84% 60%;
-    --chart-2: 0 72% 50%;
-    --chart-3: 0 100% 67%;
-    --chart-4: 0 93% 73%;
-    --chart-5: 0 100% 80%;
+    --chart-1: 0 0% 9%;
+    --chart-2: 0 0% 20%;
+    --chart-3: 0 0% 30%;
+    --chart-4: 0 0% 40%;
+    --chart-5: 0 0% 50%;
 
     /* Advanced gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(0 84% 60%) 0%, hsl(0 84% 50%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(0 0% 9%) 0%, hsl(0 0% 20%) 100%);
     --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(0 0% 98%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(0 84% 60%) 0%, hsl(0 72% 50%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(0 0% 9%) 0%, hsl(0 0% 30%) 100%);
     --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
-    --gradient-mesh: radial-gradient(circle at 20% 80%, hsl(0 84% 60% / 0.1) 0%, transparent 50%),
-                     radial-gradient(circle at 80% 20%, hsl(0 72% 50% / 0.1) 0%, transparent 50%),
-                     radial-gradient(circle at 40% 40%, hsl(0 100% 67% / 0.08) 0%, transparent 50%);
+    --gradient-mesh: radial-gradient(circle at 20% 80%, hsl(0 0% 9% / 0.1) 0%, transparent 50%),
+                     radial-gradient(circle at 80% 20%, hsl(0 0% 20% / 0.1) 0%, transparent 50%),
+                     radial-gradient(circle at 40% 40%, hsl(0 0% 30% / 0.08) 0%, transparent 50%);
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 0 0% 3.9%;
-    --sidebar-primary: 0 84% 60%;
+    --sidebar-primary: 0 0% 9%;
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 0 0% 96.1%;
     --sidebar-accent-foreground: 0 0% 9%;
     --sidebar-border: 0 0% 89.8%;
-    --sidebar-ring: 0 84% 60%;
+    --sidebar-ring: 0 0% 9%;
 
     /* Glass morphism */
     --glass-bg: rgba(255, 255, 255, 0.8);
-    --glass-border: rgba(239, 68, 68, 0.2);
-    --glass-shadow: 0 8px 32px 0 rgba(239, 68, 68, 0.1);
+    --glass-border: rgba(0, 0, 0, 0.2);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
 
     /* Neon effects */
-    --neon-primary: 0 0 20px hsl(0 84% 60% / 0.5);
-    --neon-secondary: 0 0 20px hsl(0 72% 50% / 0.5);
-    --neon-accent: 0 0 20px hsl(0 100% 67% / 0.5);
+    --neon-primary: 0 0 20px hsl(0 0% 9% / 0.5);
+    --neon-secondary: 0 0 20px hsl(0 0% 20% / 0.5);
+    --neon-accent: 0 0 20px hsl(0 0% 30% / 0.5);
   }
 
   /* Light theme */
@@ -89,7 +89,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
 
-    --primary: 0 84% 60%;
+    --primary: 0 0% 9%;
     --primary-foreground: 0 0% 98%;
 
     --secondary: 0 0% 96.1%;
@@ -112,26 +112,26 @@
 
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
-    --ring: 0 84% 60%;
+    --ring: 0 0% 9%;
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 0 0% 3.9%;
-    --sidebar-primary: 0 84% 60%;
+    --sidebar-primary: 0 0% 9%;
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 0 0% 96.1%;
     --sidebar-accent-foreground: 0 0% 9%;
     --sidebar-border: 0 0% 89.8%;
-    --sidebar-ring: 0 84% 60%;
+    --sidebar-ring: 0 0% 9%;
 
-    --chart-1: 0 84% 60%;
-    --chart-2: 0 72% 50%;
-    --chart-3: 0 100% 67%;
-    --chart-4: 0 93% 73%;
-    --chart-5: 0 100% 80%;
+    --chart-1: 0 0% 9%;
+    --chart-2: 0 0% 20%;
+    --chart-3: 0 0% 30%;
+    --chart-4: 0 0% 40%;
+    --chart-5: 0 0% 50%;
 
     --glass-bg: rgba(255, 255, 255, 0.8);
-    --glass-border: rgba(239, 68, 68, 0.2);
-    --glass-shadow: 0 8px 32px 0 rgba(239, 68, 68, 0.1);
+    --glass-border: rgba(0, 0, 0, 0.2);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
   }
 
   .dark {
@@ -144,8 +144,8 @@
     --popover: 0 0% 6%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 0 84% 60%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
 
     --secondary: 0 0% 9%;
     --secondary-foreground: 0 0% 98%;
@@ -167,40 +167,40 @@
 
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
-    --ring: 0 84% 60%;
+    --ring: 0 0% 98%;
 
     --sidebar-background: 0 0% 3.9%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 0 84% 60%;
-    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-primary: 0 0% 98%;
+    --sidebar-primary-foreground: 0 0% 9%;
     --sidebar-accent: 0 0% 9%;
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 0 0% 14.9%;
-    --sidebar-ring: 0 84% 60%;
+    --sidebar-ring: 0 0% 98%;
 
-    --chart-1: 0 84% 60%;
-    --chart-2: 0 72% 50%;
-    --chart-3: 0 100% 67%;
-    --chart-4: 0 93% 73%;
-    --chart-5: 0 100% 80%;
+    --chart-1: 0 0% 98%;
+    --chart-2: 0 0% 80%;
+    --chart-3: 0 0% 70%;
+    --chart-4: 0 0% 60%;
+    --chart-5: 0 0% 50%;
 
     --glass-bg: rgba(0, 0, 0, 0.4);
-    --glass-border: rgba(239, 68, 68, 0.3);
-    --glass-shadow: 0 8px 32px 0 rgba(239, 68, 68, 0.2);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
 
     /* Dark theme gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(0 84% 60%) 0%, hsl(0 84% 50%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(0 0% 98%) 0%, hsl(0 0% 80%) 100%);
     --gradient-card: linear-gradient(145deg, hsl(0 0% 6%) 0%, hsl(0 0% 4%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(0 84% 60%) 0%, hsl(0 72% 50%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(0 0% 98%) 0%, hsl(0 0% 70%) 100%);
     --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-    --gradient-mesh: radial-gradient(circle at 20% 80%, hsl(0 84% 60% / 0.15) 0%, transparent 50%),
-                     radial-gradient(circle at 80% 20%, hsl(0 72% 50% / 0.15) 0%, transparent 50%),
-                     radial-gradient(circle at 40% 40%, hsl(0 100% 67% / 0.1) 0%, transparent 50%);
+    --gradient-mesh: radial-gradient(circle at 20% 80%, hsl(0 0% 98% / 0.15) 0%, transparent 50%),
+                     radial-gradient(circle at 80% 20%, hsl(0 0% 80% / 0.15) 0%, transparent 50%),
+                     radial-gradient(circle at 40% 40%, hsl(0 0% 70% / 0.1) 0%, transparent 50%);
 
     /* Dark theme neon effects */
-    --neon-primary: 0 0 20px hsl(0 84% 60% / 0.5);
-    --neon-secondary: 0 0 20px hsl(0 72% 50% / 0.5);
-    --neon-accent: 0 0 20px hsl(0 100% 67% / 0.5);
+    --neon-primary: 0 0 20px hsl(0 0% 98% / 0.5);
+    --neon-secondary: 0 0 20px hsl(0 0% 80% / 0.5);
+    --neon-accent: 0 0 20px hsl(0 0% 70% / 0.5);
   }
 }
 
@@ -321,7 +321,7 @@
 
   /* Text effects */
   .text-gradient {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(0 72% 50%) 100%);
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(0 0% 30%) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
