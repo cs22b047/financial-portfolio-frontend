@@ -7,15 +7,15 @@ interface TopPerformersProps {
 }
 
 const TYPE_COLORS = {
-  STOCK: 'bg-chart-2/20 text-chart-2',
+  STOCK: 'bg-red-500/20 text-red-600',
   BOND: 'bg-success/20 text-success',
   CASH: 'bg-warning/20 text-warning',
-  CRYPTO: 'bg-chart-3/20 text-chart-3',
+  CRYPTO: 'bg-red-400/20 text-red-500',
 };
 
 export function TopPerformers({ data }: TopPerformersProps) {
   return (
-    <div className="rounded-xl bg-card p-6 border border-border/50">
+    <div className="glass-card p-6 border border-border/50 hover-lift">
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-card-foreground">Top Performers</h3>
         <p className="text-sm text-muted-foreground">Best performing assets</p>

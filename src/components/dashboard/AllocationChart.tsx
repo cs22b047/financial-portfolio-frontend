@@ -6,12 +6,12 @@ interface AllocationChartProps {
 }
 
 const COLORS = {
-  STOCK: 'hsl(217, 91%, 60%)',
-  ETF: 'hsl(200, 85%, 45%)',
-  BOND: 'hsl(160, 84%, 39%)',
+  STOCK: 'hsl(0, 84%, 60%)',
+  ETF: 'hsl(0, 72%, 50%)',
+  BOND: 'hsl(120, 100%, 25%)',
   CASH: 'hsl(38, 92%, 50%)',
-  CRYPTO: 'hsl(280, 65%, 60%)',
-  MUTUAL_FUND: 'hsl(270, 70%, 55%)',
+  CRYPTO: 'hsl(0, 100%, 67%)',
+  MUTUAL_FUND: 'hsl(0, 93%, 73%)',
 };
 
 const TYPE_LABELS = {
@@ -42,7 +42,7 @@ export function AllocationChart({ data }: AllocationChartProps) {
   };
 
   return (
-    <div className="rounded-xl bg-card p-6 border border-border/50">
+    <div className="glass-card p-6 border border-border/50 hover-lift">
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-card-foreground">Asset Allocation</h3>
         <p className="text-sm text-muted-foreground">By asset type</p>

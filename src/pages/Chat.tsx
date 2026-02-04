@@ -209,7 +209,7 @@ export default function Chat() {
       <div className="flex h-[calc(100vh-2rem)] max-w-7xl mx-auto">
         {/* Chat History Sidebar */}
         {showHistory && (
-          <div className="w-64 border-r border-border/30 bg-secondary/20 backdrop-blur-sm">
+          <div className="w-64 border-r border-border/30 bg-card/50 backdrop-blur-sm">
             <div className="p-4 border-b border-border/30">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
@@ -227,7 +227,7 @@ export default function Chat() {
               </div>
               <Button
                 onClick={handleNewChat}
-                className="w-full bg-gradient-to-r from-primary to-chart-2 hover:from-primary/90 hover:to-chart-2/90"
+                className="w-full bg-gradient-to-r from-primary to-red-600 hover:from-primary/90 hover:to-red-600/90"
                 size="sm"
               >
                 <Plus className="h-4 w-4 mr-2" />
@@ -310,7 +310,7 @@ export default function Chat() {
             {queries.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center">
                 <div className="mb-8">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-chart-2 shadow-xl mx-auto mb-4">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-red-600 shadow-xl mx-auto mb-4">
                     <Sparkles className="h-8 w-8 text-white" />
                   </div>
                   <h2 className="text-2xl font-bold text-foreground mb-2">How can I help you today?</h2>
@@ -335,7 +335,7 @@ export default function Chat() {
                     <div className="flex justify-start">
                       <div className="max-w-[85%]">
                         <div className="flex items-start gap-3">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-chart-2 shadow-lg flex-shrink-0 mt-1">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-red-600 shadow-lg flex-shrink-0 mt-1">
                             <MessageSquare className="h-4 w-4 text-white" />
                           </div>
                           <div className="glass-card border border-border/50 rounded-2xl px-4 py-3 shadow-sm flex-1">
@@ -392,7 +392,7 @@ export default function Chat() {
                 <Button
                   onClick={() => handleSearch(inputValue)}
                   disabled={!inputValue.trim() || isSearching}
-                  className="h-[60px] px-6 bg-gradient-to-r from-primary to-chart-2 hover:from-primary/90 hover:to-chart-2/90 shadow-lg"
+                  className="h-[60px] px-6 bg-gradient-to-r from-primary to-red-600 hover:from-primary/90 hover:to-red-600/90 shadow-lg"
                 >
                   <Search className="h-5 w-5" />
                 </Button>

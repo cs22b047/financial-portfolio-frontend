@@ -19,42 +19,42 @@ const navigation = [
     href: '/', 
     icon: LayoutDashboard,
     description: 'Overview & Analytics',
-    gradient: 'from-blue-500 to-purple-600'
+    gradient: 'from-red-500 to-red-600'
   },
   { 
     name: 'Portfolio', 
     href: '/assets', 
     icon: Wallet,
     description: 'Asset Management',
-    gradient: 'from-green-500 to-emerald-600'
+    gradient: 'from-red-600 to-red-700'
   },
   { 
     name: 'Conversational Agent', 
     href: '/chat', 
     icon: MessageSquare,
     description: 'Smart Chat Bot',
-    gradient: 'from-purple-500 to-pink-600'
+    gradient: 'from-red-400 to-red-500'
   },
   { 
     name: 'Alerts', 
     href: '/alerts', 
     icon: Bell,
     description: 'Smart Notifications',
-    gradient: 'from-yellow-500 to-orange-600'
+    gradient: 'from-red-500 to-red-600'
   },
   { 
     name: 'Insights', 
     href: '/ai', 
     icon: Sparkles,
     description: 'Portfolio Insights',
-    gradient: 'from-cyan-500 to-blue-600'
+    gradient: 'from-red-600 to-red-700'
   },
   { 
     name: 'Settings', 
     href: '/settings', 
     icon: Settings,
     description: 'Preferences',
-    gradient: 'from-gray-500 to-slate-600'
+    gradient: 'from-red-400 to-red-500'
   },
 ];
 
@@ -127,17 +127,17 @@ export function Sidebar() {
   return (
     <aside className="fixed left-0 top-0 z-50 h-screen w-72 glass-card border-r border-border/50">
       {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-chart-2/5 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-red-500/5 pointer-events-none" />
       <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none" />
       
       <div className="relative flex h-full flex-col">
         {/* Logo Section */}
         <div className="flex h-20 items-center gap-4 px-6 border-b border-border/30">
           <div className="relative">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-chart-2 shadow-lg">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-red-600 shadow-lg">
               <PieChart className="h-6 w-6 text-white" />
             </div>
-            <div className="absolute -top-1 -right-1 h-4 w-4 bg-green-400 rounded-full border-2 border-background animate-pulse" />
+            <div className="absolute -top-1 -right-1 h-4 w-4 bg-red-400 rounded-full border-2 border-background animate-pulse" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-gradient">PortfolioX</h1>
@@ -241,7 +241,7 @@ export function Sidebar() {
                 )}
 
                 {item.name === 'Insights' && (
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 text-[10px] font-bold text-white">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-red-600 text-[10px] font-bold text-white">
                     💡
                   </div>
                 )}
@@ -254,10 +254,10 @@ export function Sidebar() {
         <div className="border-t border-border/30 p-4">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-chart-2 text-sm font-bold text-white shadow-lg">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-red-600 text-sm font-bold text-white shadow-lg">
                 JD
               </div>
-              <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-green-400 rounded-full border-2 border-background" />
+              <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-red-400 rounded-full border-2 border-background" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-sidebar-foreground truncate">John Doe</p>
