@@ -9,7 +9,7 @@ import {
   Settings,
   PieChart,
   ChevronRight,
-  MessageSquare,
+  Sparkles,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -36,18 +36,18 @@ const navigation = [
     gradient: 'from-orange-500 to-red-600'
   },
   { 
-    name: 'Conversational Agent', 
-    href: '/chat', 
-    icon: MessageSquare,
-    description: 'Smart Chat Bot',
-    gradient: 'from-purple-500 to-pink-600'
-  },
-  { 
     name: 'Alerts', 
     href: '/alerts', 
     icon: Bell,
     description: 'Smart Notifications',
     gradient: 'from-yellow-500 to-orange-600'
+  },
+  { 
+    name: 'Insights', 
+    href: '/ai', 
+    icon: Sparkles,
+    description: 'Portfolio Insights',
+    gradient: 'from-cyan-500 to-blue-600'
   },
   { 
     name: 'Settings', 
@@ -237,6 +237,12 @@ export function Sidebar() {
                 {item.name === 'Alerts' && (
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground animate-pulse">
                     3
+                  </div>
+                )}
+
+                {item.name === 'Insights' && (
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 text-[10px] font-bold text-white">
+                    💡
                   </div>
                 )}
               </Link>
