@@ -79,12 +79,12 @@ export default function Insights() {
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'
         }`}>
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-clip-text text-transparent animate-pulse">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent animate-pulse">
               Portfolio Insights
             </h1>
-            <p className="text-slate-400 mt-1">Simple overview of your investments</p>
+            <p className="text-muted-foreground mt-1">Simple overview of your investments</p>
           </div>
-          <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
+          <Button className="bg-gradient-to-r from-primary to-red-600 hover:from-primary/90 hover:to-red-600/90 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
             <Eye className="mr-2 h-4 w-4" />
             View Details
           </Button>
@@ -93,72 +93,72 @@ export default function Insights() {
         {/* Animated Cards Grid */}
         <div className="grid gap-6 md:grid-cols-2">
           {/* Health Score - Animated */}
-          <Card className={`bg-slate-900/50 border border-slate-700/50 p-6 backdrop-blur-sm hover:bg-slate-900/70 transform hover:scale-105 transition-all duration-500 hover:shadow-2xl ${
+          <Card className={`glass-card border border-border/50 p-6 backdrop-blur-sm hover:bg-card/70 transform hover:scale-105 transition-all duration-500 hover:shadow-2xl ${
             isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-20'
           }`} style={{ transitionDelay: '100ms' }}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-green-500/20 animate-pulse">
-                <Shield className="h-6 w-6 text-green-400" />
+              <div className="p-2 rounded-lg bg-success/20 animate-pulse">
+                <Shield className="h-6 w-6 text-success" />
               </div>
-              <h3 className="text-lg font-semibold text-white">Health Score</h3>
+              <h3 className="text-lg font-semibold text-foreground">Health Score</h3>
             </div>
             
             <div className="text-center">
-              <div className="text-4xl font-bold text-green-400 mb-2 transition-all duration-300">
+              <div className="text-4xl font-bold text-success mb-2 transition-all duration-300">
                 {Math.round(healthScore)}/100
               </div>
-              <Badge className="bg-green-500/20 text-green-400 border-green-500/30 animate-bounce">
+              <Badge className="bg-success/20 text-success border-success/30 animate-bounce">
                 Good Health
               </Badge>
             </div>
 
             <div className="mt-4 space-y-2">
-              <div className={`flex items-center gap-2 text-sm text-slate-300 transition-all duration-700 ${
+              <div className={`flex items-center gap-2 text-sm text-muted-foreground transition-all duration-700 ${
                 healthScore > 40 ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-5'
               }`}>
-                <CheckCircle className="h-4 w-4 text-green-400 animate-pulse" />
+                <CheckCircle className="h-4 w-4 text-success animate-pulse" />
                 <span>Balanced portfolio</span>
               </div>
-              <div className={`flex items-center gap-2 text-sm text-slate-300 transition-all duration-700 ${
+              <div className={`flex items-center gap-2 text-sm text-muted-foreground transition-all duration-700 ${
                 healthScore > 70 ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-5'
               }`} style={{ transitionDelay: '200ms' }}>
-                <CheckCircle className="h-4 w-4 text-green-400 animate-pulse" />
+                <CheckCircle className="h-4 w-4 text-success animate-pulse" />
                 <span>Good diversification</span>
               </div>
             </div>
           </Card>
 
           {/* Performance - Animated */}
-          <Card className={`bg-slate-900/50 border border-slate-700/50 p-6 backdrop-blur-sm hover:bg-slate-900/70 transform hover:scale-105 transition-all duration-500 hover:shadow-2xl ${
+          <Card className={`glass-card border border-border/50 p-6 backdrop-blur-sm hover:bg-card/70 transform hover:scale-105 transition-all duration-500 hover:shadow-2xl ${
             isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-20'
           }`} style={{ transitionDelay: '200ms' }}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-blue-500/20 animate-pulse">
-                <TrendingUp className="h-6 w-6 text-blue-400" />
+              <div className="p-2 rounded-lg bg-primary/20 animate-pulse">
+                <TrendingUp className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-lg font-semibold text-white">Performance</h3>
+              <h3 className="text-lg font-semibold text-foreground">Performance</h3>
             </div>
 
             <div className="space-y-4">
               <div className="flex justify-between">
-                <span className="text-slate-400">Your Return</span>
-                <span className="text-2xl font-bold text-blue-400 transition-all duration-300">
+                <span className="text-muted-foreground">Your Return</span>
+                <span className="text-2xl font-bold text-primary transition-all duration-300">
                   +{portfolioReturn.toFixed(1)}%
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Market Return</span>
-                <span className="text-xl text-slate-300 transition-all duration-300">
+                <span className="text-muted-foreground">Market Return</span>
+                <span className="text-xl text-foreground transition-all duration-300">
                   +{marketReturn.toFixed(1)}%
                 </span>
               </div>
               
-              <div className={`text-center p-3 bg-green-500/10 rounded-lg border border-green-500/30 transition-all duration-1000 ${
+              <div className={`text-center p-3 bg-success/10 rounded-lg border border-success/30 transition-all duration-1000 ${
                 portfolioReturn > marketReturn ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
               }`}>
                 <div className="flex items-center justify-center gap-2">
-                  <Sparkles className="h-4 w-4 text-green-400 animate-spin" />
-                  <span className="text-green-400 font-semibold">
+                  <Sparkles className="h-4 w-4 text-success animate-spin" />
+                  <span className="text-success font-semibold">
                     Beating market by +{Math.max(0, portfolioReturn - marketReturn).toFixed(1)}%
                   </span>
                 </div>
@@ -167,32 +167,32 @@ export default function Insights() {
           </Card>
 
           {/* Goal Progress - Animated */}
-          <Card className={`bg-slate-900/50 border border-slate-700/50 p-6 backdrop-blur-sm hover:bg-slate-900/70 transform hover:scale-105 transition-all duration-500 hover:shadow-2xl ${
+          <Card className={`glass-card border border-border/50 p-6 backdrop-blur-sm hover:bg-card/70 transform hover:scale-105 transition-all duration-500 hover:shadow-2xl ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
           }`} style={{ transitionDelay: '300ms' }}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-purple-500/20 animate-pulse">
-                <Target className="h-6 w-6 text-purple-400" />
+              <div className="p-2 rounded-lg bg-red-500/20 animate-pulse">
+                <Target className="h-6 w-6 text-red-500" />
               </div>
-              <h3 className="text-lg font-semibold text-white">Goal Progress</h3>
+              <h3 className="text-lg font-semibold text-foreground">Goal Progress</h3>
             </div>
 
             <div className="space-y-4">
               <div className="flex justify-between">
-                <span className="text-slate-400">Current</span>
-                <span className="text-xl font-bold text-white transition-all duration-300">
+                <span className="text-muted-foreground">Current</span>
+                <span className="text-xl font-bold text-foreground transition-all duration-300">
                   ${currentValue.toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Target</span>
-                <span className="text-xl text-slate-300">${portfolioData.goalTarget.toLocaleString()}</span>
+                <span className="text-muted-foreground">Target</span>
+                <span className="text-xl text-foreground">${portfolioData.goalTarget.toLocaleString()}</span>
               </div>
               
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">Progress</span>
-                  <span className="text-purple-400 transition-all duration-300">
+                  <span className="text-muted-foreground">Progress</span>
+                  <span className="text-red-500 transition-all duration-300">
                     {Math.round(goalProgress)}%
                   </span>
                 </div>
@@ -205,57 +205,57 @@ export default function Insights() {
           </Card>
 
           {/* Quick Tips - Animated */}
-          <Card className={`bg-slate-900/50 border border-slate-700/50 p-6 backdrop-blur-sm hover:bg-slate-900/70 transform hover:scale-105 transition-all duration-500 hover:shadow-2xl ${
+          <Card className={`glass-card border border-border/50 p-6 backdrop-blur-sm hover:bg-card/70 transform hover:scale-105 transition-all duration-500 hover:shadow-2xl ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
           }`} style={{ transitionDelay: '400ms' }}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-yellow-500/20 animate-pulse">
-                <Lightbulb className="h-6 w-6 text-yellow-400" />
+              <div className="p-2 rounded-lg bg-warning/20 animate-pulse">
+                <Lightbulb className="h-6 w-6 text-warning" />
               </div>
-              <h3 className="text-lg font-semibold text-white">Quick Tips</h3>
+              <h3 className="text-lg font-semibold text-foreground">Quick Tips</h3>
             </div>
 
             <div className="space-y-3">
-              <div className={`p-3 bg-slate-800/50 rounded-lg hover:bg-slate-800/70 transition-all duration-300 transform hover:translate-x-2 ${
+              <div className={`p-3 bg-secondary/50 rounded-lg hover:bg-secondary/70 transition-all duration-300 transform hover:translate-x-2 ${
                 isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
               }`} style={{ transitionDelay: '600ms' }}>
-                <div className="font-medium text-white mb-1">Keep holding</div>
-                <div className="text-sm text-slate-400">Your portfolio is performing well</div>
+                <div className="font-medium text-foreground mb-1">Keep holding</div>
+                <div className="text-sm text-muted-foreground">Your portfolio is performing well</div>
               </div>
-              <div className={`p-3 bg-slate-800/50 rounded-lg hover:bg-slate-800/70 transition-all duration-300 transform hover:translate-x-2 ${
+              <div className={`p-3 bg-secondary/50 rounded-lg hover:bg-secondary/70 transition-all duration-300 transform hover:translate-x-2 ${
                 isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
               }`} style={{ transitionDelay: '700ms' }}>
-                <div className="font-medium text-white mb-1">Consider bonds</div>
-                <div className="text-sm text-slate-400">Add stability to your portfolio</div>
+                <div className="font-medium text-foreground mb-1">Consider bonds</div>
+                <div className="text-sm text-muted-foreground">Add stability to your portfolio</div>
               </div>
             </div>
           </Card>
         </div>
 
         {/* Animated Status Updates */}
-        <Card className={`bg-slate-900/50 border border-slate-700/50 p-4 backdrop-blur-sm hover:bg-slate-900/70 transition-all duration-500 ${
+        <Card className={`glass-card border border-border/50 p-4 backdrop-blur-sm hover:bg-card/70 transition-all duration-500 ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
         }`} style={{ transitionDelay: '500ms' }}>
-          <h3 className="text-lg font-semibold text-white mb-3">Status Updates</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-3">Status Updates</h3>
           
           <div className="flex flex-wrap gap-4">
             <div className={`flex items-center gap-2 transition-all duration-500 hover:scale-110 ${
               isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-5'
             }`} style={{ transitionDelay: '800ms' }}>
-              <CheckCircle className="h-4 w-4 text-green-400 animate-pulse" />
-              <span className="text-sm text-slate-300">Portfolio is healthy</span>
+              <CheckCircle className="h-4 w-4 text-success animate-pulse" />
+              <span className="text-sm text-muted-foreground">Portfolio is healthy</span>
             </div>
             <div className={`flex items-center gap-2 transition-all duration-500 hover:scale-110 ${
               isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-5'
             }`} style={{ transitionDelay: '900ms' }}>
-              <Info className="h-4 w-4 text-blue-400 animate-pulse" />
-              <span className="text-sm text-slate-300">Review due next week</span>
+              <Info className="h-4 w-4 text-primary animate-pulse" />
+              <span className="text-sm text-muted-foreground">Review due next week</span>
             </div>
             <div className={`flex items-center gap-2 transition-all duration-500 hover:scale-110 ${
               isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-5'
             }`} style={{ transitionDelay: '1000ms' }}>
-              <AlertTriangle className="h-4 w-4 text-yellow-400 animate-pulse" />
-              <span className="text-sm text-slate-300">High tech allocation</span>
+              <AlertTriangle className="h-4 w-4 text-warning animate-pulse" />
+              <span className="text-sm text-muted-foreground">High tech allocation</span>
             </div>
           </div>
         </Card>

@@ -314,7 +314,39 @@ export default function Chat() {
                     <Sparkles className="h-8 w-8 text-white" />
                   </div>
                   <h2 className="text-2xl font-bold text-foreground mb-2">How can I help you today?</h2>
-                  <p className="text-muted-foreground max-w-md">{welcomeMessage}</p>
+                  <p className="text-muted-foreground max-w-md mb-8">{welcomeMessage}</p>
+                  
+                  {/* Centered Search Input */}
+                  <div className="w-full max-w-7xl">
+                    <div className="flex items-end gap-4">
+                      <div className="flex-1 relative">
+                        <Textarea
+                          ref={textareaRef}
+                          value={inputValue}
+                          onChange={(e) => setInputValue(e.target.value)}
+                          onKeyPress={handleKeyPress}
+                          placeholder="Ask me anything..."
+                          className="min-h-[50px] max-h-[100px] resize-none glass-card border-border/50 focus:border-primary/50 pr-20"
+                          disabled={isSearching}
+                        />
+                        <div className="absolute right-3 bottom-3 flex items-center gap-2">
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <Paperclip className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <Mic className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <Button
+                        onClick={() => handleSearch(inputValue)}
+                        disabled={!inputValue.trim() || isSearching}
+                        className="h-[50px] px-6 bg-gradient-to-r from-primary to-red-600 hover:from-primary/90 hover:to-red-600/90 shadow-lg"
+                      >
+                        <Search className="h-5 w-5" />
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : (
@@ -366,39 +398,43 @@ export default function Chat() {
             )}
           </div>
 
-          {/* Search Input */}
-          <div className="border-t border-border/30 bg-card/50 backdrop-blur-sm p-6">
-            <div className="max-w-4xl mx-auto">
-              <div className="flex items-end gap-4">
-                <div className="flex-1 relative">
-                  <Textarea
-                    ref={textareaRef}
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Ask me anything... What would you like to know?"
-                    className="min-h-[60px] max-h-[120px] resize-none glass-card border-border/50 focus:border-primary/50 pr-20"
-                    disabled={isSearching}
-                  />
-                  <div className="absolute right-3 bottom-3 flex items-center gap-2">
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                      <Paperclip className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                      <Mic className="h-4 w-4" />
+          {/* Search Input - Only show when there are queries */}
+          {queries.length > 0 && (
+            <div className="border-t border-border/30 bg-card/50 backdrop-blur-sm p-6">
+              <div className="flex justify-center">
+                <div className="w-full max-w-7xl">
+                  <div className="flex items-end gap-4">
+                    <div className="flex-1 relative">
+                      <Textarea
+                        ref={textareaRef}
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder="Ask me anything..."
+                        className="min-h-[50px] max-h-[100px] resize-none glass-card border-border/50 focus:border-primary/50 pr-20"
+                        disabled={isSearching}
+                      />
+                      <div className="absolute right-3 bottom-3 flex items-center gap-2">
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <Paperclip className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <Mic className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => handleSearch(inputValue)}
+                      disabled={!inputValue.trim() || isSearching}
+                      className="h-[50px] px-6 bg-gradient-to-r from-primary to-red-600 hover:from-primary/90 hover:to-red-600/90 shadow-lg"
+                    >
+                      <Search className="h-5 w-5" />
                     </Button>
                   </div>
                 </div>
-                <Button
-                  onClick={() => handleSearch(inputValue)}
-                  disabled={!inputValue.trim() || isSearching}
-                  className="h-[60px] px-6 bg-gradient-to-r from-primary to-red-600 hover:from-primary/90 hover:to-red-600/90 shadow-lg"
-                >
-                  <Search className="h-5 w-5" />
-                </Button>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </MainLayout>
