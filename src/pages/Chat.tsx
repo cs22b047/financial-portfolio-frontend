@@ -1,206 +1,241 @@
 import { useState, useRef, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import {
   Search,
-  RotateCcw,
   Mic,
   Paperclip,
   MessageSquare,
-  Zap,
   Sparkles,
   Plus,
   History,
   Trash2,
   ChevronLeft,
   ChevronRight,
-  Bot,
+  RefreshCw,
 } from 'lucide-react';
+import { toast } from 'sonner';
 
-interface QueryResult {
-  id: string;
-  query: string;
-  response: string;
-  timestamp: Date;
+interface Message {
+  id: number;
+  role: 'USER' | 'ASSISTANT';
+  content: string;
+  queryType?: string;
+  sqlQuery?: string;
+  tokensUsed?: number;
+  processingTimeMs?: number;
+  createdDate: string;
 }
 
-interface ChatSession {
-  id: string;
+interface Conversation {
+  sessionId: string;
+  userId: string;
   title: string;
-  queries: QueryResult[];
-  createdAt: Date;
-  lastActive: Date;
+  status: string;
+  messageCount: number;
+  createdDate: string;
+  lastMessageAt: string;
+  messages?: Message[];
 }
-
-const welcomeMessages = [
-  "👋 Hello Deekshitha! What would you like to know today?",
-  "🔍 Hi Deekshitha! Ask me anything you'd like to explore.",
-  "💼 Good day Deekshitha! What can I help you discover?",
-  "🚀 Hey Deekshitha! What information are you looking for?",
-  "✨ Welcome back Deekshitha! What would you like to learn?",
-  "📈 Hi there Deekshitha! Ready to explore some topics?",
-];
 
 export default function Chat() {
-  const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
-  const [queries, setQueries] = useState<QueryResult[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [showHistory, setShowHistory] = useState(true);
-  const [welcomeMessage] = useState(() => 
-    welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)]
-  );
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const resultsEndRef = useRef<HTMLDivElement>(null);
+  
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5500';
 
-  // Load chat history from localStorage on mount
+  // Load conversations on mount
   useEffect(() => {
-    const savedSessions = localStorage.getItem('chatSessions');
-    if (savedSessions) {
-      const sessions = JSON.parse(savedSessions).map((session: any) => ({
-        ...session,
-        createdAt: new Date(session.createdAt),
-        lastActive: new Date(session.lastActive),
-        queries: session.queries.map((q: any) => ({
-          ...q,
-          timestamp: new Date(q.timestamp)
-        }))
-      }));
-      setChatSessions(sessions);
-    }
+    loadConversations();
   }, []);
 
-  // Save chat sessions to localStorage whenever they change
+  // Scroll to bottom when messages change
   useEffect(() => {
-    if (chatSessions.length > 0) {
-      localStorage.setItem('chatSessions', JSON.stringify(chatSessions));
-    }
-  }, [chatSessions]);
-
-  const generateChatTitle = (firstQuery: string) => {
-    return firstQuery.length > 30 ? firstQuery.substring(0, 30) + '...' : firstQuery;
-  };
-
-  const createNewSession = () => {
-    const newSessionId = Date.now().toString();
-    const newSession: ChatSession = {
-      id: newSessionId,
-      title: 'New Chat',
-      queries: [],
-      createdAt: new Date(),
-      lastActive: new Date()
-    };
-    
-    setChatSessions(prev => [newSession, ...prev]);
-    setCurrentSessionId(newSessionId);
-    setQueries([]);
-    setInputValue('');
-    setIsSearching(false);
-  };
-
-  const loadChatSession = (sessionId: string) => {
-    const session = chatSessions.find(s => s.id === sessionId);
-    if (session) {
-      setCurrentSessionId(sessionId);
-      setQueries(session.queries);
-    }
-  };
-
-  const updateCurrentSession = (newQueries: QueryResult[]) => {
-    if (!currentSessionId) return;
-    
-    setChatSessions(prev => prev.map(session => {
-      if (session.id === currentSessionId) {
-        const updatedSession = {
-          ...session,
-          queries: newQueries,
-          lastActive: new Date(),
-          title: newQueries.length > 0 && session.title === 'New Chat' 
-            ? generateChatTitle(newQueries[0].query)
-            : session.title
-        };
-        return updatedSession;
-      }
-      return session;
-    }));
-  };
-
-  const deleteChatSession = (sessionId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setChatSessions(prev => prev.filter(s => s.id !== sessionId));
-    if (currentSessionId === sessionId) {
-      setCurrentSessionId(null);
-      setQueries([]);
-    }
-  };
+    scrollToBottom();
+  }, [messages]);
 
   const scrollToBottom = () => {
     resultsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [queries]);
+  const loadConversations = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/chatbot/conversations?userId=default_user`);
+      if (response.ok) {
+        const data = await response.json();
+        setConversations(data);
+      }
+    } catch (error) {
+      console.error('Failed to load conversations:', error);
+    }
+  };
 
-  const handleSearch = async (query: string) => {
-    if (!query.trim()) return;
+  const createNewConversation = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/chatbot/conversations?userId=default_user`, {
+        method: 'POST',
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentSessionId(data.sessionId);
+        setMessages([]);
+        await loadConversations();
+      }
+    } catch (error) {
+      console.error('Failed to create conversation:', error);
+      toast.error('Failed to create new conversation');
+    }
+  };
 
-    // Create new session if none exists
-    if (!currentSessionId) {
-      createNewSession();
+  const loadConversation = async (sessionId: string) => {
+    try {
+      const response = await fetch(`${apiUrl}/api/chatbot/conversations/${sessionId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentSessionId(sessionId);
+        setMessages(data.messages || []);
+      }
+    } catch (error) {
+      console.error('Failed to load conversation:', error);
+      toast.error('Failed to load conversation');
+    }
+  };
+
+  const deleteConversation = async (sessionId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const response = await fetch(`${apiUrl}/api/chatbot/conversations/${sessionId}`, {
+        method: 'DELETE',
+      });
+      
+      if (response.ok) {
+        await loadConversations();
+        if (currentSessionId === sessionId) {
+          setCurrentSessionId(null);
+          setMessages([]);
+        }
+        toast.success('Conversation deleted');
+      }
+    } catch (error) {
+      console.error('Failed to delete conversation:', error);
+      toast.error('Failed to delete conversation');
+    }
+  };
+
+  const sendMessage = async (message: string) => {
+    if (!message.trim()) return;
+
+    let sessionId = currentSessionId;
+
+    // Create new conversation if none exists
+    if (!sessionId) {
+      try {
+        const response = await fetch(`${apiUrl}/api/chatbot/conversations?userId=default_user`, {
+          method: 'POST',
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          sessionId = data.sessionId;
+          setCurrentSessionId(sessionId);
+          await loadConversations();
+        } else {
+          toast.error('Failed to create conversation');
+          return;
+        }
+      } catch (error) {
+        console.error('Failed to create conversation:', error);
+        toast.error('Failed to create conversation');
+        return;
+      }
     }
 
-    const newQuery: QueryResult = {
-      id: Date.now().toString(),
-      query: query.trim(),
-      response: '',
-      timestamp: new Date(),
+    const tempMessage: Message = {
+      id: Date.now(),
+      role: 'USER',
+      content: message.trim(),
+      createdDate: new Date().toISOString(),
     };
 
-    const updatedQueries = [...queries, newQuery];
-    setQueries(updatedQueries);
+    setMessages(prev => [...prev, tempMessage]);
     setInputValue('');
-    setIsSearching(true);
+    setIsLoading(true);
 
-    // Update the current session
-    setTimeout(() => updateCurrentSession(updatedQueries), 100);
+    try {
+      const response = await fetch(`${apiUrl}/api/chatbot/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId: sessionId,
+          message: message.trim(),
+        }),
+      });
 
-    // Simulate search response
-    setTimeout(() => {
-      const responses = [
-        `Here's what I found about "${query.trim()}", Deekshitha:\n\nBased on my analysis, this topic involves several key aspects that might interest you. I've gathered comprehensive information to help answer your question thoroughly.\n\nKey insights:\n• Relevant data points and analysis\n• Current trends and patterns\n• Practical recommendations\n• Additional resources for deeper exploration\n\nWould you like me to elaborate on any specific aspect?`,
+      if (response.ok) {
+        const data = await response.json();
         
-        `Great question about "${query.trim()}", Deekshitha!\n\nI've searched through available information and found some valuable insights:\n\n📊 Data Analysis:\nThe current information suggests several important factors to consider.\n\n🔍 Key Findings:\n• Primary considerations and implications\n• Related trends and developments\n• Potential opportunities or challenges\n\n💡 Recommendations:\nBased on this analysis, here are some actionable next steps you might consider.\n\nIs there a particular angle you'd like me to focus on?`,
-        
-        `Excellent query, Deekshitha! Let me break down what I discovered about "${query.trim()}":\n\n🎯 Overview:\nThis is a multifaceted topic with several important dimensions.\n\n📈 Current Status:\nThe latest information indicates specific trends and developments.\n\n🔧 Practical Applications:\n• Immediate actionable insights\n• Long-term considerations\n• Best practices and recommendations\n\n🚀 Next Steps:\nHere are some suggested areas for further exploration.\n\nWould you like me to dive deeper into any of these areas?`,
-      ];
+        const assistantMessage: Message = {
+          id: Date.now() + 1,
+          role: 'ASSISTANT',
+          content: data.response,
+          queryType: data.queryType,
+          sqlQuery: data.sqlQuery,
+          processingTimeMs: data.processingTime,
+          createdDate: new Date().toISOString(),
+        };
 
-      const response = responses[Math.floor(Math.random() * responses.length)];
-      
-      const finalQueries = updatedQueries.map(q => 
-        q.id === newQuery.id 
-          ? { ...q, response }
-          : q
-      );
-      
-      setQueries(finalQueries);
-      updateCurrentSession(finalQueries);
-      setIsSearching(false);
-    }, 2000);
+        setMessages(prev => [...prev, assistantMessage]);
+        await loadConversations(); // Refresh conversation list
+      } else {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        toast.error('Failed to send message');
+      }
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      toast.error('Failed to send message');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleNewChat = () => {
-    createNewSession();
+    createNewConversation();
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSearch(inputValue);
+      sendMessage(inputValue);
+    }
+  };
+
+  const formatDate = (dateStr: string) => {
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString();
+    } catch {
+      return dateStr;
+    }
+  };
+
+  const formatTime = (dateStr: string) => {
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch {
+      return '';
     }
   };
 
@@ -236,32 +271,32 @@ export default function Chat() {
             </div>
             
             <div className="overflow-y-auto h-[calc(100%-120px)] p-2">
-              {chatSessions.length === 0 ? (
+              {conversations.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground text-sm">
                   No chat history yet
                 </div>
               ) : (
                 <div className="space-y-1">
-                  {chatSessions.map((session) => (
+                  {conversations.map((conversation) => (
                     <div
-                      key={session.id}
-                      onClick={() => loadChatSession(session.id)}
+                      key={conversation.sessionId}
+                      onClick={() => loadConversation(conversation.sessionId)}
                       className={cn(
                         'group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-secondary/50',
-                        currentSessionId === session.id ? 'bg-primary/10 border border-primary/20' : 'hover:bg-secondary/30'
+                        currentSessionId === conversation.sessionId ? 'bg-primary/10 border border-primary/20' : 'hover:bg-secondary/30'
                       )}
                     >
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium text-foreground truncate">
-                          {session.title}
+                          {conversation.title || 'New Chat'}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {session.queries.length} {session.queries.length === 1 ? 'query' : 'queries'} • {' '}
-                          {session.lastActive.toLocaleDateString()}
+                          {conversation.messageCount} {conversation.messageCount === 1 ? 'message' : 'messages'} • {' '}
+                          {formatDate(conversation.lastMessageAt || conversation.createdDate)}
                         </div>
                       </div>
                       <Button
-                        onClick={(e) => deleteChatSession(session.id, e)}
+                        onClick={(e) => deleteConversation(conversation.sessionId, e)}
                         variant="ghost"
                         size="sm"
                         className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/20 hover:text-destructive"
@@ -278,7 +313,7 @@ export default function Chat() {
 
         {/* Main Chat Area */}
         <div className="flex-1 flex flex-col">
-          {/* Header with New Chat */}
+          {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-border/30">
             <div className="flex items-center gap-3">
               {!showHistory && (
@@ -291,6 +326,15 @@ export default function Chat() {
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               )}
+              <div className="flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-gray-800">
+                  <Sparkles className="h-4 w-4 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-sm font-semibold text-foreground">Portfolio Assistant</h2>
+                  <p className="text-xs text-muted-foreground">AI-powered financial assistant</p>
+                </div>
+              </div>
             </div>
             {!showHistory && (
               <Button
@@ -305,16 +349,18 @@ export default function Chat() {
             )}
           </div>
 
-          {/* Results Area */}
+          {/* Messages Area */}
           <div className="flex-1 overflow-y-auto p-6">
-            {queries.length === 0 ? (
+            {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center">
                 <div className="mb-8">
                   <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-gray-800 shadow-xl mx-auto mb-4">
                     <Sparkles className="h-8 w-8 text-white" />
                   </div>
                   <h2 className="text-2xl font-bold text-foreground mb-2">How can I help you today?</h2>
-                  <p className="text-muted-foreground max-w-md mb-8">{welcomeMessage}</p>
+                  <p className="text-muted-foreground max-w-md mb-8">
+                    Ask me about your portfolio, market data, transactions, or any financial insights you need!
+                  </p>
                   
                   {/* Centered Search Input */}
                   <div className="w-full max-w-7xl">
@@ -325,25 +371,25 @@ export default function Chat() {
                           value={inputValue}
                           onChange={(e) => setInputValue(e.target.value)}
                           onKeyPress={handleKeyPress}
-                          placeholder="Ask me anything..."
+                          placeholder="Ask me anything about your portfolio..."
                           className="min-h-[50px] max-h-[100px] resize-none glass-card border-border/50 focus:border-primary/50 pr-20"
-                          disabled={isSearching}
+                          disabled={isLoading}
                         />
                         <div className="absolute right-3 bottom-3 flex items-center gap-2">
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled>
                             <Paperclip className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled>
                             <Mic className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>
                       <Button
-                        onClick={() => handleSearch(inputValue)}
-                        disabled={!inputValue.trim() || isSearching}
+                        onClick={() => sendMessage(inputValue)}
+                        disabled={!inputValue.trim() || isLoading}
                         className="h-[50px] px-6 bg-gradient-to-r from-primary to-gray-800 hover:from-primary/90 hover:to-gray-800/90 shadow-lg"
                       >
-                        <Search className="h-5 w-5" />
+                        {isLoading ? <RefreshCw className="h-5 w-5 animate-spin" /> : <Search className="h-5 w-5" />}
                       </Button>
                     </div>
                   </div>
@@ -351,55 +397,83 @@ export default function Chat() {
               </div>
             ) : (
               <div className="space-y-8 max-w-4xl mx-auto">
-                {queries.map((item) => (
-                  <div key={item.id} className="space-y-4">
-                    {/* User Query */}
-                    <div className="flex justify-end">
-                      <div className="max-w-[80%] bg-primary text-primary-foreground rounded-2xl px-4 py-3 shadow-sm">
-                        <p className="text-sm font-medium">{item.query}</p>
-                        <p className="text-xs opacity-80 mt-1">
-                          {item.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </p>
+                {messages.map((message) => (
+                  <div key={message.id} className="space-y-4">
+                    {message.role === 'USER' ? (
+                      /* User Message */
+                      <div className="flex justify-end">
+                        <div className="max-w-[80%] bg-primary text-primary-foreground rounded-2xl px-4 py-3 shadow-sm">
+                          <p className="text-sm font-medium">{message.content}</p>
+                          <p className="text-xs opacity-80 mt-1">
+                            {formatTime(message.createdDate)}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-
-                    {/* AI Response */}
-                    <div className="flex justify-start">
-                      <div className="max-w-[85%]">
-                        <div className="flex items-start gap-3">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-gray-800 shadow-lg flex-shrink-0 mt-1">
-                            <MessageSquare className="h-4 w-4 text-white" />
-                          </div>
-                          <div className="glass-card border border-border/50 rounded-2xl px-4 py-3 shadow-sm flex-1">
-                            {item.response ? (
+                    ) : (
+                      /* AI Response */
+                      <div className="flex justify-start">
+                        <div className="max-w-[85%]">
+                          <div className="flex items-start gap-3">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-gray-800 shadow-lg flex-shrink-0 mt-1">
+                              <MessageSquare className="h-4 w-4 text-white" />
+                            </div>
+                            <div className="glass-card border border-border/50 rounded-2xl px-4 py-3 shadow-sm flex-1">
                               <div className="prose prose-sm max-w-none">
                                 <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">
-                                  {item.response}
+                                  {message.content}
                                 </p>
                               </div>
-                            ) : (
-                              <div className="flex items-center gap-2">
-                                <div className="flex gap-1">
-                                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                              {message.queryType && (
+                                <div className="mt-2 pt-2 border-t border-border/30">
+                                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    <span className="font-medium">Type:</span>
+                                    <span className="px-2 py-0.5 bg-primary/10 text-primary rounded">
+                                      {message.queryType}
+                                    </span>
+                                    {message.processingTimeMs && (
+                                      <>
+                                        <span className="ml-2">•</span>
+                                        <span>{message.processingTimeMs}ms</span>
+                                      </>
+                                    )}
+                                  </div>
                                 </div>
-                                <span className="text-xs text-muted-foreground">Searching for information...</span>
-                              </div>
-                            )}
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                {isLoading && (
+                  <div className="flex justify-start">
+                    <div className="max-w-[85%]">
+                      <div className="flex items-start gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-gray-800 shadow-lg flex-shrink-0 mt-1">
+                          <MessageSquare className="h-4 w-4 text-white" />
+                        </div>
+                        <div className="glass-card border border-border/50 rounded-2xl px-4 py-3 shadow-sm">
+                          <div className="flex items-center gap-2">
+                            <div className="flex gap-1">
+                              <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                              <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                              <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                            </div>
+                            <span className="text-xs text-muted-foreground">Analyzing your request...</span>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                ))}
+                )}
                 <div ref={resultsEndRef} />
               </div>
             )}
           </div>
 
-          {/* Search Input - Only show when there are queries */}
-          {queries.length > 0 && (
+          {/* Input Area - Only show when there are messages */}
+          {messages.length > 0 && (
             <div className="border-t border-border/30 bg-card/50 backdrop-blur-sm p-6">
               <div className="flex justify-center">
                 <div className="w-full max-w-7xl">
@@ -410,25 +484,25 @@ export default function Chat() {
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyPress={handleKeyPress}
-                        placeholder="Ask me anything..."
+                        placeholder="Ask me anything about your portfolio..."
                         className="min-h-[50px] max-h-[100px] resize-none glass-card border-border/50 focus:border-primary/50 pr-20"
-                        disabled={isSearching}
+                        disabled={isLoading}
                       />
                       <div className="absolute right-3 bottom-3 flex items-center gap-2">
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled>
                           <Paperclip className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled>
                           <Mic className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
                     <Button
-                      onClick={() => handleSearch(inputValue)}
-                      disabled={!inputValue.trim() || isSearching}
+                      onClick={() => sendMessage(inputValue)}
+                      disabled={!inputValue.trim() || isLoading}
                       className="h-[50px] px-6 bg-gradient-to-r from-primary to-gray-800 hover:from-primary/90 hover:to-gray-800/90 shadow-lg"
                     >
-                      <Search className="h-5 w-5" />
+                      {isLoading ? <RefreshCw className="h-5 w-5 animate-spin" /> : <Search className="h-5 w-5" />}
                     </Button>
                   </div>
                 </div>

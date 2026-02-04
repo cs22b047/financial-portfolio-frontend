@@ -9,6 +9,7 @@ interface UserSettings {
   theme: string;
   timeZone: string;
   wallet: number;
+  target: number;
 }
 
 interface SettingsContextType {

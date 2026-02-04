@@ -19,6 +19,7 @@ import {
   RefreshCw,
   Wallet,
   DollarSign,
+  Target,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -34,6 +35,7 @@ export default function Settings() {
     theme: 'dark',
     timeZone: 'America/New_York',
     wallet: 0,
+    target: 150000,
   });
 
   // Update form when settings load
@@ -46,6 +48,7 @@ export default function Settings() {
         theme: settings.theme || 'dark',
         timeZone: settings.timeZone || 'America/New_York',
         wallet: settings.wallet || 0,
+        target: settings.target || 150000,
       });
     }
   }, [settings]);
@@ -143,6 +146,40 @@ export default function Settings() {
               </div>
               <p className="text-xs text-muted-foreground">
                 Available balance: ${formData.wallet.toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Investment Goal Section */}
+        <div className="rounded-xl bg-card border border-border/50 p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <Target className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground">Investment Goal</h3>
+              <p className="text-sm text-muted-foreground">Set your portfolio target value</p>
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="target">Target Portfolio Value</Label>
+              <div className="relative">
+                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="target"
+                  type="number"
+                  step="1000"
+                  min="0"
+                  value={formData.target}
+                  onChange={(e) => setFormData({ ...formData, target: parseFloat(e.target.value) || 0 })}
+                  className="bg-secondary border-border pl-9"
+                  placeholder="150000"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Your goal: ${formData.target.toLocaleString()} - Track progress in the Insights page
               </p>
             </div>
           </div>
