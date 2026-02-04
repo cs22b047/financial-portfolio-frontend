@@ -318,7 +318,7 @@ export default function AssetInformation() {
             </Button>
             <div>
               <h1 className="text-3xl font-bold text-foreground">{marketData.name}</h1>
-              <p className="text-muted-foreground">{marketData.symbol} • {marketData.sector}</p>
+              <p className="text-muted-foreground">{marketData.symbol}{marketData.sector ? ` • ${marketData.sector}` : ''}</p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -341,19 +341,19 @@ export default function AssetInformation() {
               <div>
                 <p className="text-sm text-muted-foreground">Current Price</p>
                 <p className="text-4xl font-bold text-foreground">
-                  ${marketData.currentPrice.toFixed(2)}
+                  {marketData.currentPrice ? `$${marketData.currentPrice.toFixed(2)}` : 'N/A'}
                 </p>
               </div>
               <div className={cn('p-4 rounded-lg', marketData.dayChange >= 0 ? 'bg-success/10' : 'bg-destructive/10')}>
                 <p className="text-sm text-muted-foreground">Today's Change</p>
                 <div className="flex items-center gap-2 mt-2">
-                  {marketData.dayChange >= 0 ? (
+                  {(marketData.dayChange || 0) >= 0 ? (
                     <TrendingUp className="h-5 w-5 text-success" />
                   ) : (
                     <TrendingDown className="h-5 w-5 text-destructive" />
                   )}
-                  <span className={cn('text-2xl font-bold', marketData.dayChange >= 0 ? 'text-success' : 'text-destructive')}>
-                    {marketData.dayChange >= 0 ? '+' : ''}{marketData.dayChange.toFixed(2)} ({marketData.dayChangePercent >= 0 ? '+' : ''}{marketData.dayChangePercent.toFixed(2)}%)
+                  <span className={cn('text-2xl font-bold', (marketData.dayChange || 0) >= 0 ? 'text-success' : 'text-destructive')}>
+                    {marketData.dayChange ? `${marketData.dayChange >= 0 ? '+' : ''}${marketData.dayChange.toFixed(2)} (${marketData.dayChangePercent >= 0 ? '+' : ''}${marketData.dayChangePercent.toFixed(2)}%)` : 'N/A'}
                   </span>
                 </div>
               </div>
@@ -370,19 +370,19 @@ export default function AssetInformation() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
                 <p className="text-xs text-muted-foreground uppercase">Today High</p>
-                <p className="text-lg font-semibold">${marketData.dayHigh.toFixed(2)}</p>
+                <p className="text-lg font-semibold">{marketData.dayHigh ? `$${marketData.dayHigh.toFixed(2)}` : 'N/A'}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground uppercase">Today Low</p>
-                <p className="text-lg font-semibold">${marketData.dayLow.toFixed(2)}</p>
+                <p className="text-lg font-semibold">{marketData.dayLow ? `$${marketData.dayLow.toFixed(2)}` : 'N/A'}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground uppercase">52 Week High</p>
-                <p className="text-lg font-semibold">${marketData.week52High.toFixed(2)}</p>
+                <p className="text-lg font-semibold">{marketData.week52High ? `$${marketData.week52High.toFixed(2)}` : 'N/A'}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground uppercase">52 Week Low</p>
-                <p className="text-lg font-semibold">${marketData.week52Low.toFixed(2)}</p>
+                <p className="text-lg font-semibold">{marketData.week52Low ? `$${marketData.week52Low.toFixed(2)}` : 'N/A'}</p>
               </div>
             </div>
           </CardContent>
@@ -413,11 +413,11 @@ export default function AssetInformation() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Exchange</p>
-                <p className="text-lg font-semibold">{marketData.exchange}</p>
+                <p className="text-lg font-semibold">{marketData.exchange || 'N/A'}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Industry</p>
-                <p className="text-lg font-semibold">{marketData.industry}</p>
+                <p className="text-lg font-semibold">{marketData.industry || 'N/A'}</p>
               </div>
             </div>
           </CardContent>
@@ -612,7 +612,7 @@ export default function AssetInformation() {
                   required
                 />
                 <p className="text-xs text-muted-foreground">
-                  Current market price: ${marketData?.currentPrice.toFixed(2)}
+                  Current market price: {marketData?.currentPrice ? `$${marketData.currentPrice.toFixed(2)}` : 'N/A'}
                 </p>
               </div>
 
@@ -693,7 +693,7 @@ export default function AssetInformation() {
                   required
                 />
                 <p className="text-xs text-muted-foreground">
-                  Current market price: ${marketData?.currentPrice.toFixed(2)}
+                  Current market price: {marketData?.currentPrice ? `$${marketData.currentPrice.toFixed(2)}` : 'N/A'}
                 </p>
               </div>
 
