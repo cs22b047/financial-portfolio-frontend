@@ -11,7 +11,6 @@ import {
   PiggyBank, 
   Activity, 
   Target, 
-  Zap,
   Brain,
   Eye,
   ArrowUpRight,
@@ -56,10 +55,6 @@ export default function Dashboard() {
             <Button variant="outline" className="glass-card border-border/50">
               <Eye className="mr-2 h-4 w-4" />
               Market Overview
-            </Button>
-            <Button className="bg-gradient-to-r from-primary to-chart-2 hover:from-primary/90 hover:to-chart-2/90 shadow-lg">
-              <Zap className="mr-2 h-4 w-4" />
-              Quick Trade
             </Button>
           </div>
         </div>
