@@ -163,17 +163,16 @@ export interface News {
 
 export interface Alert {
   id: number;
-  asset_id: number;
-  asset_symbol: string;
-  asset_name: string;
-  alert_type: 'price_above' | 'price_below' | 'percent_change' | 'volume_spike';
-  threshold_value: number;
-  current_value: number;
-  is_triggered: boolean;
-  triggered_at: string | null;
-  is_active: boolean;
-  created_date: string;
-  message: string;
+  asset: {
+    id: number;
+    symbol: string;
+    name: string;
+  };
+  targetPrice: number;
+  aboveOrBelow: 'ABOVE' | 'BELOW';
+  triggered: boolean;
+  createdDate: string;
+  updatedDate: string;
 }
 
 // Dashboard specific types
