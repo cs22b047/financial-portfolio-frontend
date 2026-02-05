@@ -57,18 +57,20 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({ data, symb
 
   const filteredData = getFilteredData();
 
-  // Transform data for chart
-  const chartData = filteredData.map(item => ({
-    date: new Date(item.priceDate).toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric',
-      year: filteredData.length > 365 ? 'numeric' : undefined 
-    }),
-    price: item.closePrice,
-    high: item.highPrice,
-    low: item.lowPrice,
-    volume: item.volume
-  }));
+  // Sort data by date ascending (oldest to newest) and transform for chart
+  const chartData = [...filteredData]
+    .sort((a, b) => new Date(a.priceDate).getTime() - new Date(b.priceDate).getTime())
+    .map(item => ({
+      date: new Date(item.priceDate).toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        year: filteredData.length > 365 ? 'numeric' : undefined 
+      }),
+      price: item.closePrice,
+      high: item.highPrice,
+      low: item.lowPrice,
+      volume: item.volume
+    }));
 
   // Calculate price change stats
   const getStats = () => {
