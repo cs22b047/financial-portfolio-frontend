@@ -1,166 +1,446 @@
-# PortfolioX - Advanced AI-Powered Portfolio Management
+# PortfolioX — AI-Powered Financial Portfolio Management System
 
 <div align="center">
-  <img src="https://img.shields.io/badge/React-18.3.1-blue?style=for-the-badge&logo=react" alt="React" />
-  <img src="https://img.shields.io/badge/TypeScript-5.8.3-blue?style=for-the-badge&logo=typescript" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/Tailwind-3.4.17-blue?style=for-the-badge&logo=tailwindcss" alt="Tailwind" />
-  <img src="https://img.shields.io/badge/Vite-5.4.19-purple?style=for-the-badge&logo=vite" alt="Vite" />
+
+![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.2-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
+![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Groq](https://img.shields.io/badge/Groq-LLM-FF6B35?style=for-the-badge)
+
+**The Silicon Cartel** — Tilak, Rudra, Vaishnavi, Deekshitha
+
+*A comprehensive, multi-asset portfolio management platform with AI-powered insights and natural language querying capabilities.*
+
 </div>
 
-## 🌟 Overview
+---
 
-PortfolioX is a cutting-edge, AI-powered portfolio management platform that combines modern design with advanced analytics. Built with React, TypeScript, and featuring a glass morphism UI, it provides real-time portfolio tracking, AI-driven insights, and professional-grade financial analysis.
+## 📋 Table of Contents
 
-## ✨ Key Features
+- [The Problem We Solve](#-the-problem-we-solve)
+- [Our Solution](#-our-solution)
+- [System Architecture](#-system-architecture)
+- [Database Design](#-database-design)
+- [Technology Stack](#-technology-stack)
+- [Design Decisions](#-design-decisions)
+- [API Overview](#-api-overview)
+- [Getting Started](#-getting-started)
+- [Project Structure](#-project-structure)
+- [Roadblocks](#-roadblocks)
 
-### 🤖 AI-Powered Analytics
-- **Smart Portfolio Scoring** - Comprehensive analysis of performance, risk, and diversification
-- **AI Recommendations** - Intelligent rebalancing and investment suggestions
-- **Market Sentiment Analysis** - Real-time sentiment tracking and forecasting
-- **Risk Assessment** - Advanced risk scoring with concentration alerts
+---
 
-### 🎨 Modern Design System
-- **Glass Morphism UI** - Translucent cards with backdrop blur effects
-- **Advanced Animations** - Smooth micro-interactions and hover effects
-- **Dark/Light Themes** - Sophisticated theming with system preference support
-- **Responsive Design** - Mobile-first approach with adaptive layouts
+## 🎯 The Problem We Solve
 
-### 📊 Advanced Visualizations
-- **Interactive Charts** - Real-time performance tracking with Recharts
-- **Time Range Selection** - Multiple timeframe analysis (1D to ALL)
-- **Volume Overlays** - Trading volume visualization
-- **Trend Analysis** - Mini sparkline charts in stat cards
+### The Challenge of Modern Portfolio Management
 
-### 💼 Portfolio Management
-- **Real-time Tracking** - Live portfolio value and performance metrics
-- **Asset Allocation** - Visual breakdown by asset type
-- **Transaction History** - Detailed activity feed with transaction types
-- **Performance Analytics** - Comprehensive returns and metrics analysis
+Managing a diversified investment portfolio in today's financial landscape presents several challenges:
 
-## 🚀 Tech Stack
+1. **Fragmented Information**: Investors must track multiple asset classes (stocks, bonds, crypto, ETFs, mutual funds) across different platforms with no unified view.
 
-- **Frontend**: React 18.3.1 with TypeScript
-- **Styling**: Tailwind CSS with custom design system
-- **Charts**: Recharts for data visualization
-- **UI Components**: Radix UI primitives with custom styling
-- **Build Tool**: Vite for fast development and building
-- **State Management**: React Query for server state
-- **Routing**: React Router DOM
-- **Theme**: Next-themes for advanced theming
+2. **Data Overload**: Financial data from various sources (Yahoo Finance, CoinGecko, Finnhub) is scattered, making it difficult to get a holistic portfolio perspective.
 
-## 🛠️ Installation & Setup
+3. **Complex Analysis**: Calculating portfolio performance, risk metrics (Sharpe ratio, VaR, volatility), and making informed decisions requires technical expertise most retail investors lack.
+
+4. **Real-Time Monitoring**: Markets move fast. Manual tracking of price changes, news sentiment, and ESG ratings is time-consuming and error-prone.
+
+5. **Natural Language Barrier**: Traditional portfolio tools require learning complex interfaces. Users can't simply ask "How is my tech portfolio performing?" or "What's my dividend income this year?"
+
+6. **Sustainability Blindspot**: ESG (Environmental, Social, Governance) factors are increasingly important, but most tools don't integrate sustainability metrics into investment decisions.
+
+---
+
+## 💡 Our Solution
+
+**PortfolioX** is an end-to-end portfolio management system that addresses these challenges through:
+
+### 🏦 Unified Multi-Asset Management
+- Track **stocks, ETFs, bonds, cryptocurrency, mutual funds, and cash** in a single dashboard
+- Real-time price updates from multiple data providers
+- Unified transaction history and dividend tracking
+
+### 🤖 AI-Powered Natural Language Interface
+- **Chat with your portfolio** using plain English
+- Ask questions like:
+  - "What's my total portfolio value?"
+  - "Show me my best performing stocks"
+  - "Which assets have high ESG scores?"
+  - "What dividends did I receive last quarter?"
+- Powered by **Groq LLM** for fast, intelligent responses
+
+### 📊 Advanced Analytics
+- **Technical indicators**: RSI, MACD, Bollinger Bands, Moving Averages
+- **Risk metrics**: Volatility, Sharpe Ratio, VaR (95%, 99%), Max Drawdown
+- **Performance tracking**: Daily returns, cumulative returns, benchmarking
+- **5-year historical data** for comprehensive analysis
+
+### 🌱 ESG Integration
+- Environmental, Social, and Governance scores for all holdings
+- Controversy level tracking
+- Filter investments by sustainability criteria
+
+### 📰 Market Intelligence
+- Aggregated financial news with **sentiment analysis**
+- News filtered by your portfolio holdings
+- Read/unread tracking for important updates
+
+---
+
+## 🏗 System Architecture
+![alt text](architecture.jpeg)
+
+
+### Component Responsibilities
+
+| Component | Technology | Port | Responsibility |
+|-----------|------------|------|----------------|
+| **Frontend** | React + TypeScript + Tailwind | 5173 | User interface, visualizations, user interactions |
+| **Backend API** | Spring Boot (Java 17) | 5500 | REST API, business logic, data persistence |
+| **Chatbot Service** | Flask (Python) | 5000 | NLP query processing, SQL generation, AI responses |
+| **Database** | MySQL 8.0 | 3306 | Data persistence, relational data storage |
+| **Data Fetchers** | Python Scripts | N/A | External API integration, data population |
+
+---
+
+## 🗄 Database Design
+
+### Entity Relationship Diagram
+![alt text](db_design.jpeg)
+
+### Core Tables (12)
+
+| Table | Purpose | Key Fields |
+|-------|---------|------------|
+| `asset_types` | Asset category definitions | STOCK, ETF, CRYPTO, BOND, CASH, MUTUAL_FUND |
+| `assets` | User's portfolio holdings | symbol, quantity, purchase_price, status |
+| `market_data` | Real-time market prices | current_price, day_change, volume, pe_ratio |
+| `price_history` | Historical OHLCV data | open, high, low, close, adjusted_close, volume |
+| `transactions` | Buy/sell transaction log | transaction_type, quantity, price, fees |
+| `dividends` | Dividend payment history | amount_per_share, payment_date, total_amount |
+| `esg_ratings` | ESG sustainability scores | environment, social, governance scores |
+| `news` | Financial news articles | title, summary, sentiment, source |
+| `technical_indicators` | RSI, MACD, Bollinger, etc. | 25+ technical indicators per price point |
+| `stock_summary` | Aggregated statistics | returns, volatility, Sharpe ratio, VaR |
+| `user_settings` | User preferences | theme, currency, notifications |
+| `currencies` | Currency reference data | code, exchange_rate, is_crypto |
+
+---
+
+## 🛠 Technology Stack
+
+### Frontend
+| Technology | Purpose |
+|------------|---------|
+| **React 18.3** | UI component library |
+| **TypeScript 5.8** | Type-safe JavaScript |
+| **Tailwind CSS** | Utility-first styling |
+| **Vite** | Build tool and dev server |
+| **Recharts** | Data visualization |
+| **Radix UI** | Accessible component primitives |
+| **React Query** | Server state management |
+| **React Router** | Client-side routing |
+
+### Backend
+| Technology | Purpose |
+|------------|---------|
+| **Spring Boot 4.0.2** | REST API framework |
+| **Java 17** | Backend language |
+| **Spring Data JPA** | ORM and data access |
+| **Flyway** | Database migrations |
+| **MySQL 8.0** | Relational database |
+| **Spring Actuator** | Health monitoring |
+
+### AI/Chatbot Service
+| Technology | Purpose |
+|------------|---------|
+| **Flask** | Python web framework |
+| **Groq LLM** | Fast AI inference |
+| **mysql-connector-python** | Database connectivity |
+| **Custom SQL Generator** | Natural language to SQL |
+
+### Data Pipeline
+| Technology | Purpose |
+|------------|---------|
+| **Python 3.8+** | Data fetching scripts |
+| **yfinance** | Yahoo Finance API wrapper |
+| **CoinGecko API** | Cryptocurrency data |
+| **Finnhub API** | Stock news and ESG data |
+
+---
+
+## 🎨 Design Decisions
+
+### 1. **Why Separate Chatbot Service?**
+
+**Decision**: Run the chatbot as a separate Flask microservice rather than embedding in Spring Boot.
+
+**Rationale**:
+- **Language Fit**: Python excels in NLP/ML tasks with better library support (Groq SDK, prompt engineering)
+- **Independent Scaling**: Chatbot can scale separately from main API under heavy AI load
+- **Fault Isolation**: Chatbot failures don't crash the main application
+- **Development Speed**: Python allows rapid prototyping for AI features
+- **Future-Proofing**: Easy to swap LLM providers (OpenAI, Anthropic, local models)
+
+### 2. **Why Cache External API Data?**
+
+**Decision**: Store all external API data (prices, news, ESG) in our database rather than fetching on-demand.
+
+**Rationale**:
+- **Rate Limiting**: Free API tiers have strict limits (Yahoo: 100/hour, CoinGecko: 30/min)
+- **Performance**: Sub-millisecond database queries vs 200-500ms API calls
+- **Reliability**: Application works even when external APIs are down
+- **Historical Analysis**: We need historical data that APIs may not retain
+- **Consistency**: Same data shown across all users and sessions
+
+### 3. **Why Unified Assets Table with Nullable Fields?**
+
+**Decision**: Single `assets` table with nullable asset-specific columns instead of separate tables per asset type.
+
+**Rationale**:
+- **Simpler Queries**: Portfolio totals don't require JOINs across multiple tables
+- **Unified API**: One endpoint handles all asset types
+- **Easier Maintenance**: Adding new asset types doesn't require schema changes
+- **Trade-off Accepted**: ~70% nullable fields, but worth it for query simplicity
+- **Extensibility**: New asset-specific fields can be added without breaking changes
+
+### 4. **Why Flyway for Migrations?**
+
+**Decision**: Use Flyway for database schema management instead of JPA auto-generation.
+
+**Rationale**:
+- **Version Control**: Migrations are versioned and tracked in Git
+- **Reproducibility**: Same schema guaranteed across all environments
+- **Rollback Support**: Can revert problematic migrations
+- **Team Collaboration**: Multiple developers can add migrations without conflicts
+- **Production Safety**: No accidental schema changes in production
+
+### 5. **Why React with TypeScript?**
+
+**Decision**: TypeScript over vanilla JavaScript for the frontend.
+
+**Rationale**:
+- **Type Safety**: Catch errors at compile time, not runtime
+- **Better IDE Support**: Autocomplete, refactoring, go-to-definition
+- **Self-Documenting**: Types serve as documentation
+- **Team Scalability**: Easier onboarding for new developers
+- **API Integration**: Type-safe API response handling
+
+### 6. **Why Glass Morphism UI?**
+
+**Decision**: Modern glass morphism design with translucent cards and backdrop blur.
+
+**Rationale**:
+- **Visual Hierarchy**: Depth and layering improve information architecture
+- **Modern Aesthetic**: Aligns with current design trends (iOS, Windows 11)
+- **Accessibility**: Dark/light mode support for user preference
+- **Professional Feel**: Financial applications need to inspire trust
+
+### 7. **Why Pre-Calculate Technical Indicators?**
+
+**Decision**: Store calculated RSI, MACD, Bollinger Bands, etc. in database rather than computing on-demand.
+
+**Rationale**:
+- **Performance**: Avoid complex calculations on every page load
+- **Consistency**: Same values shown to all users
+- **Historical Accuracy**: Preserve indicator values at specific points in time
+- **Query Flexibility**: Can filter/sort by indicator values in SQL
+
+---
+
+## 📡 API Overview
+
+The backend exposes **123 REST endpoints** across 9 controllers:
+
+| Controller | Base Path | Endpoints | Purpose |
+|------------|-----------|-----------|---------|
+| **Assets** | `/api/assets` | 14 | Portfolio holdings, buy/sell, watchlist |
+| **Market Data** | `/api/market-data` | 10 | Real-time prices, search, gainers/losers |
+| **Technical Indicators** | `/api/technical-indicators` | 12 | RSI, MACD, Bollinger Bands, MAs |
+| **Stock Summary** | `/api/stock-summary` | 12 | Returns, volatility, risk metrics |
+| **Transactions** | `/api/transactions` | 8 | Buy/sell history, gains/losses |
+| **Dividends** | `/api/dividends` | 10 | Dividend tracking, income reports |
+| **ESG Ratings** | `/api/esg-ratings` | 18 | Sustainability scores, filtering |
+| **News** | `/api/news` | 22 | Financial news, sentiment, sources |
+| **User Settings** | `/api/user-settings` | 15 | Preferences, notifications, themes |
+| **Chat** | `/api/chat` | 2 | AI chatbot interface |
+
+**Full API documentation**: See [API_ENDPOINTS.md](portfolioapp/API_ENDPOINTS.md)
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 18+ 
-- npm or yarn
 
-### Quick Start
+- Java 17+
+- Node.js 18+
+- MySQL 8.0+
+- Python 3.8+
+- Maven 3.6+
+
+### Quick Start (Automated)
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/portfoliox-advanced.git
-cd portfoliox-advanced
+git clone <repository-url>
+cd neueda_project
 
-# Install dependencies
-npm install
+# Set database credentials
+export DB_USER=root
+export DB_PASSWORD=your_password
 
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
+# Run initialization script
+./init_database.sh
 ```
 
-### Available Scripts
+### Manual Setup
 
+#### 1. Database Setup
 ```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run preview      # Preview production build
-npm run lint         # Run ESLint
-npm run test         # Run tests
-npm run test:watch   # Run tests in watch mode
+mysql -u root -p
+```
+```sql
+DROP DATABASE IF EXISTS portfolio_db;
+CREATE DATABASE portfolio_db;
 ```
 
-## 📱 Features Showcase
-
-### Dashboard
-- Real-time portfolio overview
-- AI insights banner with recommendations
-- Market status indicators
-- Advanced stat cards with trend visualization
-
-### AI Insights Page
-- Portfolio scoring system (Performance: 91/100, Risk: 72/100)
-- AI-generated recommendations with confidence scores
-- Market sentiment analysis (72% Bullish)
-- Volatility forecasting and risk alerts
-
-### Portfolio Management
-- Comprehensive asset tracking
-- Advanced filtering and sorting
-- Real-time price updates
-- Performance analytics
-
-## 🎨 Design Philosophy
-
-PortfolioX follows a **dark-first design approach** with:
-
-- **Glass Morphism**: Translucent elements with backdrop blur
-- **Gradient Systems**: Advanced color gradients and mesh backgrounds
-- **Micro-Interactions**: Smooth animations and hover effects
-- **Typography**: Inter for UI, JetBrains Mono for numbers
-- **Accessibility**: WCAG compliant with proper contrast ratios
-
-## 🔧 Configuration
-
-### Environment Variables
-Create a `.env` file in the root directory:
-
-```env
-VITE_API_URL=your_api_endpoint
-VITE_APP_NAME=PortfolioX
+#### 2. Backend (Spring Boot)
+```bash
+cd portfolioapp
+./mvnw spring-boot:run
+# Runs on http://localhost:5500
 ```
 
-### Customization
-The design system can be customized through:
-- `tailwind.config.ts` - Tailwind configuration
-- `src/index.css` - CSS custom properties and global styles
-- `src/lib/utils.ts` - Utility functions
+#### 3. Populate Data
+```bash
+cd portfolioapp/python-scripts
+pip install -r requirements.txt
 
-## 📊 Performance
+python populate_stocks.py
+python populate_mutual_funds.py
+python populate_esg.py
+python populate_crypto.py
+python populate_news.py
+python historical_price.py
+python populate_user_assets.py
+```
 
-- **Lighthouse Score**: 95+ across all metrics
-- **Bundle Size**: Optimized with code splitting
-- **Load Time**: < 2s on 3G networks
-- **Animations**: 60fps smooth animations
+#### 4. Chatbot Service
+```bash
+cd portfolioapp/chatbot-service
+pip install -r requirements.txt
+export GROQ_API_KEY=your_groq_api_key
+python app.py
+# Runs on http://localhost:5000
+```
 
-## 🤝 Contributing
+#### 5. Frontend
+```bash
+cd financial-portfolio-frontend
+npm install
+npm run dev
+# Runs on http://localhost:5173
+```
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+---
+
+## 📁 Project Structure
+
+```
+neueda_project/
+├── README.md                          # This file
+├── init_database.sh                   # Automated setup script
+│
+├── financial-portfolio-frontend/      # React Frontend
+│   ├── src/
+│   │   ├── components/               # Reusable UI components
+│   │   │   ├── dashboard/           # Dashboard widgets
+│   │   │   ├── layout/              # Layout components
+│   │   │   └── ui/                  # Base UI components
+│   │   ├── pages/                   # Page components
+│   │   │   ├── Dashboard.tsx
+│   │   │   ├── Assets.tsx
+│   │   │   ├── Chat.tsx
+│   │   │   ├── Insights.tsx
+│   │   │   └── Settings.tsx
+│   │   ├── context/                 # React context providers
+│   │   ├── hooks/                   # Custom React hooks
+│   │   ├── types/                   # TypeScript type definitions
+│   │   └── lib/                     # Utility functions
+│   ├── package.json
+│   └── vite.config.ts
+│
+└── portfolioapp/                      # Spring Boot Backend
+    ├── src/main/java/.../
+    │   ├── controller/              # REST API endpoints
+    │   ├── service/                 # Business logic
+    │   ├── repository/              # Data access layer
+    │   ├── entity/                  # JPA entities
+    │   ├── dto/                     # Data transfer objects
+    │   └── config/                  # Configuration classes
+    ├── src/main/resources/
+    │   ├── db/migration/            # Flyway migrations
+    │   └── application.properties
+    │
+    ├── chatbot-service/              # Python AI Service
+    │   ├── app.py                   # Flask application
+    │   ├── chatbot_service.py       # Main service logic
+    │   ├── query_classifier.py      # Query type detection
+    │   ├── sql_generator.py         # NL to SQL conversion
+    │   ├── explanation_generator.py # Response formatting
+    │   └── prompts.py               # LLM prompts
+    │
+    ├── python-scripts/               # Data Population Scripts
+    │   ├── populate_stocks.py
+    │   ├── populate_crypto.py
+    │   ├── populate_esg.py
+    │   ├── populate_news.py
+    │   ├── historical_price.py
+    │   └── populate_user_assets.py
+    │
+    ├── architecture/                 # Design Documentation
+    │   ├── requirements.md
+    │   └── database-design.md
+    │
+    └── pom.xml
+```
+
+---
+
+## 🚧 Roadblocks
+
+<!-- 
+Document any challenges, blockers, or known issues here.
+This section will be filled in as the project progresses.
+-->
+
+### Current Blockers
+- [ ] *To be filled*
+
+### Known Issues
+- [ ] *To be filled*
+
+### Technical Debt
+- [ ] *To be filled*
+
+### Future Improvements
+- [ ] *To be filled*
+
+---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [Radix UI](https://www.radix-ui.com/) for accessible UI primitives
-- [Recharts](https://recharts.org/) for beautiful charts
-- [Tailwind CSS](https://tailwindcss.com/) for utility-first styling
-- [Lucide React](https://lucide.dev/) for beautiful icons
-
-## 📞 Support
-
-For support, email support@portfoliox.com or join our Discord community.
+This project was developed as part of the Neueda Training Program.
 
 ---
 
 <div align="center">
-  <p>Built with ❤️ by the PortfolioX Team</p>
-  <p>⭐ Star this repo if you find it helpful!</p>
+
+**Built with ❤️ by The Silicon Cartel**
+
+*Tilak • Rudra • Vaishnavi • Deekshitha*
+
 </div>
