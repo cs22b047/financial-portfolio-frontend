@@ -3,6 +3,7 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import ReactMarkdown from 'react-markdown';
 import {
   Search,
   Mic,
@@ -418,10 +419,34 @@ export default function Chat() {
                               <MessageSquare className="h-4 w-4 text-white" />
                             </div>
                             <div className="glass-card border border-border/50 rounded-2xl px-4 py-3 shadow-sm flex-1">
-                              <div className="prose prose-sm max-w-none">
-                                <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">
+                              <div className="prose prose-sm dark:prose-invert max-w-none prose-p:m-0 prose-p:leading-relaxed prose-headings:m-1 prose-headings:font-semibold prose-ul:m-1 prose-ol:m-1 prose-li:m-0 prose-li:p-0 prose-code:bg-secondary prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-secondary prose-pre:p-3 prose-pre:overflow-auto prose-a:text-primary prose-a:underline prose-strong:font-semibold">
+                                <ReactMarkdown
+                                  components={{
+                                    p: ({ children }) => <p className="text-sm text-foreground mb-2">{children}</p>,
+                                    h1: ({ children }) => <h1 className="text-lg font-bold text-foreground mb-2 mt-3">{children}</h1>,
+                                    h2: ({ children }) => <h2 className="text-base font-bold text-foreground mb-2 mt-2">{children}</h2>,
+                                    h3: ({ children }) => <h3 className="text-sm font-bold text-foreground mb-1 mt-2">{children}</h3>,
+                                    ul: ({ children }) => <ul className="list-disc list-inside text-sm text-foreground mb-2 space-y-1">{children}</ul>,
+                                    ol: ({ children }) => <ol className="list-decimal list-inside text-sm text-foreground mb-2 space-y-1">{children}</ol>,
+                                    li: ({ children }) => <li className="text-sm text-foreground">{children}</li>,
+                                    code: ({ children }) => <code className="bg-secondary/60 px-2 py-1 rounded text-xs font-mono text-foreground">{children}</code>,
+                                    pre: ({ children }) => <pre className="bg-secondary/60 p-3 rounded-lg overflow-auto mb-2 text-xs">{children}</pre>,
+                                    blockquote: ({ children }) => <blockquote className="border-l-4 border-primary pl-4 py-2 text-sm italic text-muted-foreground mb-2">{children}</blockquote>,
+                                    a: ({ children, href }) => <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary underline hover:text-primary/80">{children}</a>,
+                                    table: ({ children }) => (
+                                      <div className="overflow-x-auto mb-4 rounded-lg border border-border/50 bg-secondary/20">
+                                        <table className="w-full border-collapse text-sm">{children}</table>
+                                      </div>
+                                    ),
+                                    thead: ({ children }) => <thead className="bg-primary/20 border-b-2 border-primary/40">{children}</thead>,
+                                    tbody: ({ children }) => <tbody className="divide-y divide-border/30">{children}</tbody>,
+                                    tr: ({ children, isHeader }) => <tr className={isHeader ? '' : 'hover:bg-primary/5 transition-colors'}>{children}</tr>,
+                                    th: ({ children }) => <th className="px-3 py-2 text-left font-semibold text-foreground first:pl-4 last:pr-4">{children}</th>,
+                                    td: ({ children }) => <td className="px-3 py-2 text-foreground first:pl-4 last:pr-4">{children}</td>,
+                                  }}
+                                >
                                   {message.content}
-                                </p>
+                                </ReactMarkdown>
                               </div>
                               {message.queryType && (
                                 <div className="mt-2 pt-2 border-t border-border/30">

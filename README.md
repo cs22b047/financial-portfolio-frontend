@@ -18,7 +18,7 @@
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [The Problem We Solve](#-the-problem-we-solve)
 - [Our Solution](#-our-solution)
@@ -33,7 +33,7 @@
 
 ---
 
-## 🎯 The Problem We Solve
+## The Problem We Solve
 
 ### The Challenge of Modern Portfolio Management
 
@@ -45,24 +45,24 @@ Managing a diversified investment portfolio in today's financial landscape prese
 
 3. **Complex Analysis**: Calculating portfolio performance, risk metrics (Sharpe ratio, VaR, volatility), and making informed decisions requires technical expertise most retail investors lack.
 
-4. **Real-Time Monitoring**: Markets move fast. Manual tracking of price changes, news sentiment, and ESG ratings is time-consuming and error-prone.
+<!-- 4. **Real-Time Monitoring**: Markets move fast. Manual tracking of price changes, news sentiment, and ESG ratings is time-consuming and error-prone. -->
 
-5. **Natural Language Barrier**: Traditional portfolio tools require learning complex interfaces. Users can't simply ask "How is my tech portfolio performing?" or "What's my dividend income this year?"
+4. **Natural Language Barrier**: Traditional portfolio tools require learning complex interfaces. Users can't simply ask "How is my tech portfolio performing?" or "What's my dividend income this year?"
 
-6. **Sustainability Blindspot**: ESG (Environmental, Social, Governance) factors are increasingly important, but most tools don't integrate sustainability metrics into investment decisions.
+5. **Sustainability Blindspot**: ESG (Environmental, Social, Governance) factors are increasingly important, but most tools don't integrate sustainability metrics into investment decisions.
 
 ---
 
-## 💡 Our Solution
+## Our Solution
 
 **PortfolioX** is an end-to-end portfolio management system that addresses these challenges through:
 
-### 🏦 Unified Multi-Asset Management
+### Unified Multi-Asset Management
 - Track **stocks, ETFs, bonds, cryptocurrency, mutual funds, and cash** in a single dashboard
 - Real-time price updates from multiple data providers
 - Unified transaction history and dividend tracking
 
-### 🤖 AI-Powered Natural Language Interface
+### AI-Powered Natural Language Interface
 - **Chat with your portfolio** using plain English
 - Ask questions like:
   - "What's my total portfolio value?"
@@ -71,25 +71,19 @@ Managing a diversified investment portfolio in today's financial landscape prese
   - "What dividends did I receive last quarter?"
 - Powered by **Groq LLM** for fast, intelligent responses
 
-### 📊 Advanced Analytics
-- **Technical indicators**: RSI, MACD, Bollinger Bands, Moving Averages
-- **Risk metrics**: Volatility, Sharpe Ratio, VaR (95%, 99%), Max Drawdown
-- **Performance tracking**: Daily returns, cumulative returns, benchmarking
-- **5-year historical data** for comprehensive analysis
-
-### 🌱 ESG Integration
+### ESG Integration
 - Environmental, Social, and Governance scores for all holdings
 - Controversy level tracking
 - Filter investments by sustainability criteria
 
-### 📰 Market Intelligence
-- Aggregated financial news with **sentiment analysis**
+### Market Intelligence
+- Aggregated financial news with AI summaries.
 - News filtered by your portfolio holdings
 - Read/unread tracking for important updates
 
 ---
 
-## 🏗 System Architecture
+## System Architecture
 ![alt text](architecture.jpeg)
 
 
@@ -97,7 +91,7 @@ Managing a diversified investment portfolio in today's financial landscape prese
 
 | Component | Technology | Port | Responsibility |
 |-----------|------------|------|----------------|
-| **Frontend** | React + TypeScript + Tailwind | 5173 | User interface, visualizations, user interactions |
+| **Frontend** | React + TypeScript + Tailwind | 8080 | User interface, visualizations, user interactions |
 | **Backend API** | Spring Boot (Java 17) | 5500 | REST API, business logic, data persistence |
 | **Chatbot Service** | Flask (Python) | 5000 | NLP query processing, SQL generation, AI responses |
 | **Database** | MySQL 8.0 | 3306 | Data persistence, relational data storage |
@@ -129,7 +123,7 @@ Managing a diversified investment portfolio in today's financial landscape prese
 
 ---
 
-## 🛠 Technology Stack
+## Technology Stack
 
 ### Frontend
 | Technology | Purpose |
@@ -171,20 +165,10 @@ Managing a diversified investment portfolio in today's financial landscape prese
 
 ---
 
-## 🎨 Design Decisions
+## Design Decisions
 
-### 1. **Why Separate Chatbot Service?**
 
-**Decision**: Run the chatbot as a separate Flask microservice rather than embedding in Spring Boot.
-
-**Rationale**:
-- **Language Fit**: Python excels in NLP/ML tasks with better library support (Groq SDK, prompt engineering)
-- **Independent Scaling**: Chatbot can scale separately from main API under heavy AI load
-- **Fault Isolation**: Chatbot failures don't crash the main application
-- **Development Speed**: Python allows rapid prototyping for AI features
-- **Future-Proofing**: Easy to swap LLM providers (OpenAI, Anthropic, local models)
-
-### 2. **Why Cache External API Data?**
+### 1. **Why Cache External API Data?**
 
 **Decision**: Store all external API data (prices, news, ESG) in our database rather than fetching on-demand.
 
@@ -195,6 +179,18 @@ Managing a diversified investment portfolio in today's financial landscape prese
 - **Historical Analysis**: We need historical data that APIs may not retain
 - **Consistency**: Same data shown across all users and sessions
 
+### 2. **Why Separate Chatbot Service?**
+
+**Decision**: Run the chatbot as a separate Flask microservice rather than embedding in Spring Boot.
+
+**Rationale**:
+- **Language Fit**: Python excels in NLP/ML tasks with better library support (Groq SDK, prompt engineering)
+- **Independent Scaling**: Chatbot can scale separately from main API under heavy AI load
+- **Fault Isolation**: Chatbot failures don't crash the main application
+- **Development Speed**: Python allows rapid prototyping for AI features
+- **Future-Proofing**: Easy to swap LLM providers (OpenAI, Anthropic, local models)
+
+
 ### 3. **Why Unified Assets Table with Nullable Fields?**
 
 **Decision**: Single `assets` table with nullable asset-specific columns instead of separate tables per asset type.
@@ -203,54 +199,24 @@ Managing a diversified investment portfolio in today's financial landscape prese
 - **Simpler Queries**: Portfolio totals don't require JOINs across multiple tables
 - **Unified API**: One endpoint handles all asset types
 - **Easier Maintenance**: Adding new asset types doesn't require schema changes
-- **Trade-off Accepted**: ~70% nullable fields, but worth it for query simplicity
+- **Trade-off Accepted**: ~30% nullable fields, but worth it for query simplicity
 - **Extensibility**: New asset-specific fields can be added without breaking changes
 
-### 4. **Why Flyway for Migrations?**
 
-**Decision**: Use Flyway for database schema management instead of JPA auto-generation.
-
-**Rationale**:
-- **Version Control**: Migrations are versioned and tracked in Git
-- **Reproducibility**: Same schema guaranteed across all environments
-- **Rollback Support**: Can revert problematic migrations
-- **Team Collaboration**: Multiple developers can add migrations without conflicts
-- **Production Safety**: No accidental schema changes in production
-
-### 5. **Why React with TypeScript?**
+### 4. **Why React with TypeScript**
 
 **Decision**: TypeScript over vanilla JavaScript for the frontend.
 
 **Rationale**:
 - **Type Safety**: Catch errors at compile time, not runtime
 - **Better IDE Support**: Autocomplete, refactoring, go-to-definition
-- **Self-Documenting**: Types serve as documentation
+- **Modular Nature**: React is inherently modular, easier to collaborate.
+- **Better Community Support**: React has better documentation, broader adoption, and extensive ecosystem resources
 - **Team Scalability**: Easier onboarding for new developers
-- **API Integration**: Type-safe API response handling
-
-### 6. **Why Glass Morphism UI?**
-
-**Decision**: Modern glass morphism design with translucent cards and backdrop blur.
-
-**Rationale**:
-- **Visual Hierarchy**: Depth and layering improve information architecture
-- **Modern Aesthetic**: Aligns with current design trends (iOS, Windows 11)
-- **Accessibility**: Dark/light mode support for user preference
-- **Professional Feel**: Financial applications need to inspire trust
-
-### 7. **Why Pre-Calculate Technical Indicators?**
-
-**Decision**: Store calculated RSI, MACD, Bollinger Bands, etc. in database rather than computing on-demand.
-
-**Rationale**:
-- **Performance**: Avoid complex calculations on every page load
-- **Consistency**: Same values shown to all users
-- **Historical Accuracy**: Preserve indicator values at specific points in time
-- **Query Flexibility**: Can filter/sort by indicator values in SQL
 
 ---
 
-## 📡 API Overview
+## API Overview
 
 The backend exposes **123 REST endpoints** across 9 controllers:
 
@@ -271,7 +237,7 @@ The backend exposes **123 REST endpoints** across 9 controllers:
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -347,7 +313,7 @@ npm run dev
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 neueda_project/
@@ -410,7 +376,7 @@ neueda_project/
 
 ---
 
-## 🚧 Roadblocks
+## Roadblocks
 
 <!-- 
 Document any challenges, blockers, or known issues here.
@@ -439,7 +405,7 @@ This project was developed as part of the Neueda Training Program.
 
 <div align="center">
 
-**Built with ❤️ by The Silicon Cartel**
+**Built by The Silicon Cartel**
 
 *Tilak • Rudra • Vaishnavi • Deekshitha*
 
