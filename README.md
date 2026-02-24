@@ -441,3 +441,293 @@ P5 -->|Validation Errors| P4
 P4 -->|Mapping Documentation| P6
 P6 -->|Docs| D2
 D1 -->|Mapping ID linked to NiFi Flow| A
+
+
+Below are professional integration points and data mapping details for your NiFi → LLM → Scala generation pipeline. You can paste this directly into your architecture document.
+
+
+---
+
+🔗 Integration Points
+
+1️⃣ NiFi Client → Ingestion Service
+
+Purpose: Retrieve raw flow definition data
+
+Interface Type: REST API
+Protocol: HTTPS
+Data Format: JSON
+
+Key Operations
+
+Fetch NiFi flow/process group
+
+Retrieve processor configurations
+
+Pull connection metadata
+
+
+Inputs
+
+NiFi Flow ID
+
+Authentication token
+
+
+Outputs
+
+Raw NiFi JSON payload
+
+
+Risks / Considerations
+
+Authentication handling
+
+Rate limiting
+
+Large payload size
+
+API version compatibility
+
+
+
+---
+
+2️⃣ Ingestion Service → JSON Parser
+
+Purpose: Extract relevant processor properties
+
+Interface Type: Internal service call
+Data Format: JSON (raw → structured)
+
+Transformation
+
+Remove irrelevant metadata
+
+Flatten nested structures
+
+Extract processor configs
+
+
+Output Schema (example)
+
+{
+  "processorId": "string",
+  "processorType": "string",
+  "properties": { },
+  "relationships": [ ]
+}
+
+
+---
+
+3️⃣ Parser → Transformation Service
+
+Purpose: Normalize data for LLM consumption
+
+Interface Type: Internal
+Data Format: Structured JSON
+
+Key Normalizations
+
+Standardize property names
+
+Resolve nulls/defaults
+
+Enrich with derived fields
+
+Order processors if needed
+
+
+Why Important ⚠️
+
+LLMs perform much better with clean, consistent JSON.
+
+
+---
+
+4️⃣ Transformation Service → LLM Mapping Service
+
+Purpose: Generate equivalent Scala/Spark code
+
+Interface Type: REST API (LLM endpoint)
+Protocol: HTTPS
+Payload Type: Prompt + JSON context
+
+Request Structure
+
+{
+  "nifiFlow": { ...normalizedJson },
+  "generationRules": { ... },
+  "target": "scala-spark"
+}
+
+Response
+
+{
+  "scalaCode": "string",
+  "confidenceScore": 0.0,
+  "mappingDoc": "string"
+}
+
+Critical Controls 🚨
+
+Prompt versioning
+
+Token limits
+
+Timeout handling
+
+Retry strategy
+
+
+(This is very important in enterprise reviews.)
+
+
+---
+
+5️⃣ LLM Service → Scala Validator
+
+Purpose: Ensure generated code is compilable and safe
+
+Interface Type: Internal
+Validation Types:
+
+Static Validation
+
+Syntax check
+
+Import resolution
+
+Basic linting
+
+
+Optional Advanced (recommended ⭐)
+
+Dry-run compilation
+
+Spark logical plan check
+
+Security scan
+
+
+Outputs
+
+Valid Path
+
+{
+  "status": "VALID",
+  "scalaCode": "..."
+}
+
+Invalid Path
+
+{
+  "status": "INVALID",
+  "errors": [ ... ]
+}
+
+
+---
+
+6️⃣ Validator → Persistence Layer
+
+Purpose: Store generated assets
+
+Interface Type: Database write
+
+Stored Artifacts
+
+Artifact	Description
+
+Scala Code	Generated Spark job
+Mapping ID	Links to NiFi flow
+Mapping Documentation	Human-readable explanation
+Validation Status	Pass/fail
+Version	Important for traceability
+
+
+
+---
+
+🧭 Data Mapping (Important Section)
+
+NiFi → Internal Canonical Model
+
+NiFi Field	Internal Field	Notes
+
+processor.id	processorId	Direct
+component.type	processorType	Normalized
+component.properties	properties	Cleaned
+relationships	relationships	Flattened
+position	(optional)	Usually ignored
+
+
+
+---
+
+Canonical Model → LLM Prompt Model
+
+Internal Field	Prompt Usage
+
+processorType	Determines code template
+properties	Drives parameter mapping
+relationships	Determines data flow
+flow order	Determines Spark pipeline order
+
+
+
+---
+
+LLM Output → Repository Schema
+
+LLM Field	Database Column
+
+scalaCode	code_blob
+mappingDoc	documentation
+confidenceScore	confidence
+timestamp	generated_at
+flowId	nifi_flow_id
+
+
+
+---
+
+⚠️ Enterprise Gaps You May Want to Address
+
+Based on your design (speaking like an architect reviewing HSBC work):
+
+🔴 Recommended Additions
+
+Versioning of generated code
+
+Prompt version tracking
+
+Retry + DLQ for LLM failures
+
+Observability (logs/metrics/traces)
+
+Idempotency for NiFi fetch
+
+Security scanning of generated code
+
+
+
+---
+
+✅ If you want to go senior-level impressive
+
+I can next generate:
+
+Level-1 data mapping matrix
+
+Canonical data model schema
+
+OpenAPI contracts
+
+Event-driven integration (NATS — matches your backend work)
+
+Production risks section (reviewers LOVE this)
+
+
+Just say the word 👍
