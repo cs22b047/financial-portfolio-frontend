@@ -410,3 +410,34 @@ This project was developed as part of the Neueda Training Program.
 *Tilak • Rudra • Vaishnavi • Deekshitha*
 
 </div>
+
+
+
+flowchart LR
+
+%% ===== External Entity =====
+A[[NiFi Client]]
+
+%% ===== Processes =====
+P1((Fetch Raw JSON))
+P2((Parse JSON))
+P3((Clean & Normalize))
+P4((Generate Scala via LLM))
+P5((Validate Scala Code))
+P6((Generate Mapping Docs))
+
+%% ===== Data Stores =====
+D1[(Code Repository)]
+D2[(Mapping Documentation Store)]
+
+%% ===== Data Flows =====
+A -->|Raw JSON| P1
+P1 -->|Raw JSON Payload| P2
+P2 -->|Structured Properties| P3
+P3 -->|Normalized JSON| P4
+P4 -->|Generated Scala Code| P5
+P5 -->|Validated Code| D1
+P5 -->|Validation Errors| P4
+P4 -->|Mapping Documentation| P6
+P6 -->|Docs| D2
+D1 -->|Mapping ID linked to NiFi Flow| A
