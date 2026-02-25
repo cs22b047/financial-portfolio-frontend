@@ -1,25 +1,730 @@
-The proposed solution implements an automated, multi-stage pipeline that converts Apache NiFi flow exports into runnable Spark/Scala projects. The design emphasizes deterministic processing, controlled use of AI assistance, strong validation, and full auditability to support enterprise-grade migration requirements.
+# PortfolioX — AI-Powered Financial Portfolio Management System
 
-The process begins when a migration engineer exports the required NiFi flow in JSON format from the NiFi user interface and uploads it through the system’s ingestion interface. Upon submission, the Ingestion Service authenticates the user and performs initial validations, including file type verification, size checks, and basic JSON structure validation. Once validated, the system assigns a unique conversion job identifier and securely stores the uploaded file in encrypted staging storage. Any malformed or unauthorized submissions are rejected and logged for audit purposes.
+<div align="center">
 
-Following successful ingestion, the JSON Parser component reads the NiFi export and converts it into an internal object model. During this stage, the parser validates the presence of required structural elements such as processor identifiers, relationships, and connection definitions. It also extracts key metadata including processor configurations, flow structure, and controller service references. As part of secure processing, the parser performs early detection and redaction of sensitive fields (such as passwords or tokens) and sanitizes string inputs to prevent injection risks. If critical structural issues are detected, the process fails fast; otherwise, a parsed flow model is produced.
+![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.2-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
+![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Groq](https://img.shields.io/badge/Groq-LLM-FF6B35?style=for-the-badge)
 
-The Deterministic Converter then performs flow normalization to transform the parsed data into a canonical intermediate model. This step standardizes processor metadata, resolves NiFi version differences, normalizes property naming, and removes UI-specific artifacts that are not relevant for execution. The converter constructs the flow dependency graph, detects cycles, and performs a topological sort to determine the correct execution order of processors. This normalization layer ensures that downstream mapping logic operates on a consistent, version-agnostic representation of the flow.
+**The Silicon Cartel** — Tilak, Rudra, Vaishnavi, Deekshitha
 
-Once normalization is complete, the Mapping Engine classifies each processor to determine the appropriate translation strategy. Processors with known deterministic equivalents are routed to the rule-based mapper, while unsupported or complex processors are flagged for AI-assisted mapping. Custom processors or ambiguous cases are marked for potential manual review. This classification produces a processor mapping plan that drives subsequent stages.
+*A comprehensive, multi-asset portfolio management platform with AI-powered insights and natural language querying capabilities.*
 
-For supported processors, the Rule-Based Mapper applies predefined transformation templates that convert NiFi processor behavior into equivalent Spark/Scala logic. Property mappings, parameter translations, and execution semantics are handled deterministically to ensure repeatable and high-confidence outputs. If a required rule is missing or only partially applicable, the processor is escalated to the AI-assisted path and a warning is recorded.
+</div>
 
-Processors requiring intelligent interpretation are handled by the AI-Assisted Mapper. Before invoking the large language model, the system constructs a sanitized prompt that removes or masks any sensitive information extracted from the original NiFi flow. Structured context describing the processor’s behavior and configuration is then sent to the model. The returned mapping suggestion is validated against expected schemas and assigned a confidence score. Based on configurable thresholds, low-confidence results or complex mappings are automatically routed to a manual review queue to ensure human oversight.
+---
 
-When manual review is required, designated reviewers examine the proposed mappings through a controlled interface. Reviewers may approve, modify, or reject mappings as needed. All reviewer actions are fully audited to maintain traceability and governance. Once approved, the mappings are returned to the pipeline for consolidation.
+## Table of Contents
 
-The Mapping Engine then consolidates all deterministic and AI-assisted mappings into a unified logical execution plan. During this stage, the system validates dependency integrity, checks for unmapped processors, identifies unsupported features, and generates structured warnings where necessary. The result is a validated execution blueprint ready for code generation.
+- [The Problem We Solve](#-the-problem-we-solve)
+- [Our Solution](#-our-solution)
+- [System Architecture](#-system-architecture)
+- [Database Design](#-database-design)
+- [Technology Stack](#-technology-stack)
+- [Design Decisions](#-design-decisions)
+- [API Overview](#-api-overview)
+- [Getting Started](#-getting-started)
+- [Project Structure](#-project-structure)
+- [Roadblocks](#-roadblocks)
 
-The Code Generator consumes the finalized execution plan and produces a complete runnable Spark/Scala project. This includes Scala source files implementing the transformed logic, SBT build configuration, dependency definitions, and runtime configuration templates. The generator enforces secure coding practices by avoiding hardcoded credentials, applying consistent naming conventions, and embedding standard logging and error-handling scaffolding. Optional performance optimizations and retry wrappers may also be included based on configuration.
+---
 
-Following code generation, the Documentation Generator produces a comprehensive migration report. This report includes the processor mapping summary, AI-assisted decisions, unsupported components, confidence metrics, and any identified migration risks. The documentation provides transparency and supports downstream validation by migration teams.
+## The Problem We Solve
 
-In the final stage, the Output Service packages the generated Spark project together with the associated reports and makes the artifacts available for secure download. Artifacts are stored according to configurable retention policies, and temporary working data is securely purged after processing. Throughout the entire pipeline, detailed audit logs capture user actions, mapping decisions, AI usage, and system events to support compliance and operational monitoring.
+### The Challenge of Modern Portfolio Management
 
-Overall, the design provides a scalable and secure framework for automating NiFi-to-Spark migration while maintaining deterministic control, human oversight for complex cases, and enterprise-grade governance.
+Managing a diversified investment portfolio in today's financial landscape presents several challenges:
+
+1. **Fragmented Information**: Investors must track multiple asset classes (stocks, bonds, crypto, ETFs, mutual funds) across different platforms with no unified view.
+
+2. **Data Overload**: Financial data from various sources (Yahoo Finance, CoinGecko, Finnhub) is scattered, making it difficult to get a holistic portfolio perspective.
+
+3. **Complex Analysis**: Calculating portfolio performance, risk metrics (Sharpe ratio, VaR, volatility), and making informed decisions requires technical expertise most retail investors lack.
+
+<!-- 4. **Real-Time Monitoring**: Markets move fast. Manual tracking of price changes, news sentiment, and ESG ratings is time-consuming and error-prone. -->
+
+4. **Natural Language Barrier**: Traditional portfolio tools require learning complex interfaces. Users can't simply ask "How is my tech portfolio performing?" or "What's my dividend income this year?"
+
+5. **Sustainability Blindspot**: ESG (Environmental, Social, Governance) factors are increasingly important, but most tools don't integrate sustainability metrics into investment decisions.
+
+---
+
+## Our Solution
+
+**PortfolioX** is an end-to-end portfolio management system that addresses these challenges through:
+
+### Unified Multi-Asset Management
+- Track **stocks, ETFs, bonds, cryptocurrency, mutual funds, and cash** in a single dashboard
+- Real-time price updates from multiple data providers
+- Unified transaction history and dividend tracking
+
+### AI-Powered Natural Language Interface
+- **Chat with your portfolio** using plain English
+- Ask questions like:
+  - "What's my total portfolio value?"
+  - "Show me my best performing stocks"
+  - "Which assets have high ESG scores?"
+  - "What dividends did I receive last quarter?"
+- Powered by **Groq LLM** for fast, intelligent responses
+
+### ESG Integration
+- Environmental, Social, and Governance scores for all holdings
+- Controversy level tracking
+- Filter investments by sustainability criteria
+
+### Market Intelligence
+- Aggregated financial news with AI summaries.
+- News filtered by your portfolio holdings
+- Read/unread tracking for important updates
+
+---
+
+## System Architecture
+![alt text](architecture.jpeg)
+
+
+### Component Responsibilities
+
+| Component | Technology | Port | Responsibility |
+|-----------|------------|------|----------------|
+| **Frontend** | React + TypeScript + Tailwind | 8080 | User interface, visualizations, user interactions |
+| **Backend API** | Spring Boot (Java 17) | 5500 | REST API, business logic, data persistence |
+| **Chatbot Service** | Flask (Python) | 5000 | NLP query processing, SQL generation, AI responses |
+| **Database** | MySQL 8.0 | 3306 | Data persistence, relational data storage |
+| **Data Fetchers** | Python Scripts | N/A | External API integration, data population |
+
+---
+
+## 🗄 Database Design
+
+### Entity Relationship Diagram
+![alt text](db_design.jpeg)
+
+### Core Tables (12)
+
+| Table | Purpose | Key Fields |
+|-------|---------|------------|
+| `asset_types` | Asset category definitions | STOCK, ETF, CRYPTO, BOND, CASH, MUTUAL_FUND |
+| `assets` | User's portfolio holdings | symbol, quantity, purchase_price, status |
+| `market_data` | Real-time market prices | current_price, day_change, volume, pe_ratio |
+| `price_history` | Historical OHLCV data | open, high, low, close, adjusted_close, volume |
+| `transactions` | Buy/sell transaction log | transaction_type, quantity, price, fees |
+| `dividends` | Dividend payment history | amount_per_share, payment_date, total_amount |
+| `esg_ratings` | ESG sustainability scores | environment, social, governance scores |
+| `news` | Financial news articles | title, summary, sentiment, source |
+| `technical_indicators` | RSI, MACD, Bollinger, etc. | 25+ technical indicators per price point |
+| `stock_summary` | Aggregated statistics | returns, volatility, Sharpe ratio, VaR |
+| `user_settings` | User preferences | theme, currency, notifications |
+| `currencies` | Currency reference data | code, exchange_rate, is_crypto |
+
+---
+
+## Technology Stack
+
+### Frontend
+| Technology | Purpose |
+|------------|---------|
+| **React 18.3** | UI component library |
+| **TypeScript 5.8** | Type-safe JavaScript |
+| **Tailwind CSS** | Utility-first styling |
+| **Vite** | Build tool and dev server |
+| **Recharts** | Data visualization |
+| **Radix UI** | Accessible component primitives |
+| **React Query** | Server state management |
+| **React Router** | Client-side routing |
+
+### Backend
+| Technology | Purpose |
+|------------|---------|
+| **Spring Boot 4.0.2** | REST API framework |
+| **Java 17** | Backend language |
+| **Spring Data JPA** | ORM and data access |
+| **Flyway** | Database migrations |
+| **MySQL 8.0** | Relational database |
+| **Spring Actuator** | Health monitoring |
+
+### AI/Chatbot Service
+| Technology | Purpose |
+|------------|---------|
+| **Flask** | Python web framework |
+| **Groq LLM** | Fast AI inference |
+| **mysql-connector-python** | Database connectivity |
+| **Custom SQL Generator** | Natural language to SQL |
+
+### Data Pipeline
+| Technology | Purpose |
+|------------|---------|
+| **Python 3.8+** | Data fetching scripts |
+| **yfinance** | Yahoo Finance API wrapper |
+| **CoinGecko API** | Cryptocurrency data |
+| **Finnhub API** | Stock news and ESG data |
+
+---
+
+## Design Decisions
+
+
+### 1. **Why Cache External API Data?**
+
+**Decision**: Store all external API data (prices, news, ESG) in our database rather than fetching on-demand.
+
+**Rationale**:
+- **Rate Limiting**: Free API tiers have strict limits (Yahoo: 100/hour, CoinGecko: 30/min)
+- **Performance**: Sub-millisecond database queries vs 200-500ms API calls
+- **Reliability**: Application works even when external APIs are down
+- **Historical Analysis**: We need historical data that APIs may not retain
+- **Consistency**: Same data shown across all users and sessions
+
+### 2. **Why Separate Chatbot Service?**
+
+**Decision**: Run the chatbot as a separate Flask microservice rather than embedding in Spring Boot.
+
+**Rationale**:
+- **Language Fit**: Python excels in NLP/ML tasks with better library support (Groq SDK, prompt engineering)
+- **Independent Scaling**: Chatbot can scale separately from main API under heavy AI load
+- **Fault Isolation**: Chatbot failures don't crash the main application
+- **Development Speed**: Python allows rapid prototyping for AI features
+- **Future-Proofing**: Easy to swap LLM providers (OpenAI, Anthropic, local models)
+
+
+### 3. **Why Unified Assets Table with Nullable Fields?**
+
+**Decision**: Single `assets` table with nullable asset-specific columns instead of separate tables per asset type.
+
+**Rationale**:
+- **Simpler Queries**: Portfolio totals don't require JOINs across multiple tables
+- **Unified API**: One endpoint handles all asset types
+- **Easier Maintenance**: Adding new asset types doesn't require schema changes
+- **Trade-off Accepted**: ~30% nullable fields, but worth it for query simplicity
+- **Extensibility**: New asset-specific fields can be added without breaking changes
+
+
+### 4. **Why React with TypeScript**
+
+**Decision**: TypeScript over vanilla JavaScript for the frontend.
+
+**Rationale**:
+- **Type Safety**: Catch errors at compile time, not runtime
+- **Better IDE Support**: Autocomplete, refactoring, go-to-definition
+- **Modular Nature**: React is inherently modular, easier to collaborate.
+- **Better Community Support**: React has better documentation, broader adoption, and extensive ecosystem resources
+- **Team Scalability**: Easier onboarding for new developers
+
+---
+
+## API Overview
+
+The backend exposes **123 REST endpoints** across 9 controllers:
+
+| Controller | Base Path | Endpoints | Purpose |
+|------------|-----------|-----------|---------|
+| **Assets** | `/api/assets` | 14 | Portfolio holdings, buy/sell, watchlist |
+| **Market Data** | `/api/market-data` | 10 | Real-time prices, search, gainers/losers |
+| **Technical Indicators** | `/api/technical-indicators` | 12 | RSI, MACD, Bollinger Bands, MAs |
+| **Stock Summary** | `/api/stock-summary` | 12 | Returns, volatility, risk metrics |
+| **Transactions** | `/api/transactions` | 8 | Buy/sell history, gains/losses |
+| **Dividends** | `/api/dividends` | 10 | Dividend tracking, income reports |
+| **ESG Ratings** | `/api/esg-ratings` | 18 | Sustainability scores, filtering |
+| **News** | `/api/news` | 22 | Financial news, sentiment, sources |
+| **User Settings** | `/api/user-settings` | 15 | Preferences, notifications, themes |
+| **Chat** | `/api/chat` | 2 | AI chatbot interface |
+
+**Full API documentation**: See [API_ENDPOINTS.md](portfolioapp/API_ENDPOINTS.md)
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Java 17+
+- Node.js 18+
+- MySQL 8.0+
+- Python 3.8+
+- Maven 3.6+
+
+### Quick Start (Automated)
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd neueda_project
+
+# Set database credentials
+export DB_USER=root
+export DB_PASSWORD=your_password
+
+# Run initialization script
+./init_database.sh
+```
+
+### Manual Setup
+
+#### 1. Database Setup
+```bash
+mysql -u root -p
+```
+```sql
+DROP DATABASE IF EXISTS portfolio_db;
+CREATE DATABASE portfolio_db;
+```
+
+#### 2. Backend (Spring Boot)
+```bash
+cd portfolioapp
+./mvnw spring-boot:run
+# Runs on http://localhost:5500
+```
+
+#### 3. Populate Data
+```bash
+cd portfolioapp/python-scripts
+pip install -r requirements.txt
+
+python populate_stocks.py
+python populate_mutual_funds.py
+python populate_esg.py
+python populate_crypto.py
+python populate_news.py
+python historical_price.py
+python populate_user_assets.py
+```
+
+#### 4. Chatbot Service
+```bash
+cd portfolioapp/chatbot-service
+pip install -r requirements.txt
+export GROQ_API_KEY=your_groq_api_key
+python app.py
+# Runs on http://localhost:5000
+```
+
+#### 5. Frontend
+```bash
+cd financial-portfolio-frontend
+npm install
+npm run dev
+# Runs on http://localhost:5173
+```
+
+---
+
+## Project Structure
+
+```
+neueda_project/
+├── README.md                          # This file
+├── init_database.sh                   # Automated setup script
+│
+├── financial-portfolio-frontend/      # React Frontend
+│   ├── src/
+│   │   ├── components/               # Reusable UI components
+│   │   │   ├── dashboard/           # Dashboard widgets
+│   │   │   ├── layout/              # Layout components
+│   │   │   └── ui/                  # Base UI components
+│   │   ├── pages/                   # Page components
+│   │   │   ├── Dashboard.tsx
+│   │   │   ├── Assets.tsx
+│   │   │   ├── Chat.tsx
+│   │   │   ├── Insights.tsx
+│   │   │   └── Settings.tsx
+│   │   ├── context/                 # React context providers
+│   │   ├── hooks/                   # Custom React hooks
+│   │   ├── types/                   # TypeScript type definitions
+│   │   └── lib/                     # Utility functions
+│   ├── package.json
+│   └── vite.config.ts
+│
+└── portfolioapp/                      # Spring Boot Backend
+    ├── src/main/java/.../
+    │   ├── controller/              # REST API endpoints
+    │   ├── service/                 # Business logic
+    │   ├── repository/              # Data access layer
+    │   ├── entity/                  # JPA entities
+    │   ├── dto/                     # Data transfer objects
+    │   └── config/                  # Configuration classes
+    ├── src/main/resources/
+    │   ├── db/migration/            # Flyway migrations
+    │   └── application.properties
+    │
+    ├── chatbot-service/              # Python AI Service
+    │   ├── app.py                   # Flask application
+    │   ├── chatbot_service.py       # Main service logic
+    │   ├── query_classifier.py      # Query type detection
+    │   ├── sql_generator.py         # NL to SQL conversion
+    │   ├── explanation_generator.py # Response formatting
+    │   └── prompts.py               # LLM prompts
+    │
+    ├── python-scripts/               # Data Population Scripts
+    │   ├── populate_stocks.py
+    │   ├── populate_crypto.py
+    │   ├── populate_esg.py
+    │   ├── populate_news.py
+    │   ├── historical_price.py
+    │   └── populate_user_assets.py
+    │
+    ├── architecture/                 # Design Documentation
+    │   ├── requirements.md
+    │   └── database-design.md
+    │
+    └── pom.xml
+```
+
+---
+
+## Roadblocks
+
+<!-- 
+Document any challenges, blockers, or known issues here.
+This section will be filled in as the project progresses.
+-->
+
+### Current Blockers
+- [ ] *To be filled*
+
+### Known Issues
+- [ ] *To be filled*
+
+### Technical Debt
+- [ ] *To be filled*
+
+### Future Improvements
+- [ ] *To be filled*
+
+---
+
+## 📄 License
+
+This project was developed as part of the Neueda Training Program.
+
+---
+
+<div align="center">
+
+**Built by The Silicon Cartel**
+
+*Tilak • Rudra • Vaishnavi • Deekshitha*
+
+</div>
+
+
+
+flowchart LR
+
+%% ===== External Entity =====
+A[[NiFi Client]]
+
+%% ===== Processes =====
+P1((Fetch Raw JSON))
+P2((Parse JSON))
+P3((Clean & Normalize))
+P4((Generate Scala via LLM))
+P5((Validate Scala Code))
+P6((Generate Mapping Docs))
+
+%% ===== Data Stores =====
+D1[(Code Repository)]
+D2[(Mapping Documentation Store)]
+
+%% ===== Data Flows =====
+A -->|Raw JSON| P1
+P1 -->|Raw JSON Payload| P2
+P2 -->|Structured Properties| P3
+P3 -->|Normalized JSON| P4
+P4 -->|Generated Scala Code| P5
+P5 -->|Validated Code| D1
+P5 -->|Validation Errors| P4
+P4 -->|Mapping Documentation| P6
+P6 -->|Docs| D2
+D1 -->|Mapping ID linked to NiFi Flow| A
+
+
+Below are professional integration points and data mapping details for your NiFi → LLM → Scala generation pipeline. You can paste this directly into your architecture document.
+
+
+---
+
+🔗 Integration Points
+
+1️⃣ NiFi Client → Ingestion Service
+
+Purpose: Retrieve raw flow definition data
+
+Interface Type: REST API
+Protocol: HTTPS
+Data Format: JSON
+
+Key Operations
+
+Fetch NiFi flow/process group
+
+Retrieve processor configurations
+
+Pull connection metadata
+
+
+Inputs
+
+NiFi Flow ID
+
+Authentication token
+
+
+Outputs
+
+Raw NiFi JSON payload
+
+
+Risks / Considerations
+
+Authentication handling
+
+Rate limiting
+
+Large payload size
+
+API version compatibility
+
+
+
+---
+
+2️⃣ Ingestion Service → JSON Parser
+
+Purpose: Extract relevant processor properties
+
+Interface Type: Internal service call
+Data Format: JSON (raw → structured)
+
+Transformation
+
+Remove irrelevant metadata
+
+Flatten nested structures
+
+Extract processor configs
+
+
+Output Schema (example)
+
+{
+  "processorId": "string",
+  "processorType": "string",
+  "properties": { },
+  "relationships": [ ]
+}
+
+
+---
+
+3️⃣ Parser → Transformation Service
+
+Purpose: Normalize data for LLM consumption
+
+Interface Type: Internal
+Data Format: Structured JSON
+
+Key Normalizations
+
+Standardize property names
+
+Resolve nulls/defaults
+
+Enrich with derived fields
+
+Order processors if needed
+
+
+Why Important ⚠️
+
+LLMs perform much better with clean, consistent JSON.
+
+
+---
+
+4️⃣ Transformation Service → LLM Mapping Service
+
+Purpose: Generate equivalent Scala/Spark code
+
+Interface Type: REST API (LLM endpoint)
+Protocol: HTTPS
+Payload Type: Prompt + JSON context
+
+Request Structure
+
+{
+  "nifiFlow": { ...normalizedJson },
+  "generationRules": { ... },
+  "target": "scala-spark"
+}
+
+Response
+
+{
+  "scalaCode": "string",
+  "confidenceScore": 0.0,
+  "mappingDoc": "string"
+}
+
+Critical Controls 🚨
+
+Prompt versioning
+
+Token limits
+
+Timeout handling
+
+Retry strategy
+
+
+(This is very important in enterprise reviews.)
+
+
+---
+
+5️⃣ LLM Service → Scala Validator
+
+Purpose: Ensure generated code is compilable and safe
+
+Interface Type: Internal
+Validation Types:
+
+Static Validation
+
+Syntax check
+
+Import resolution
+
+Basic linting
+
+
+Optional Advanced (recommended ⭐)
+
+Dry-run compilation
+
+Spark logical plan check
+
+Security scan
+
+
+Outputs
+
+Valid Path
+
+{
+  "status": "VALID",
+  "scalaCode": "..."
+}
+
+Invalid Path
+
+{
+  "status": "INVALID",
+  "errors": [ ... ]
+}
+
+
+---
+
+6️⃣ Validator → Persistence Layer
+
+Purpose: Store generated assets
+
+Interface Type: Database write
+
+Stored Artifacts
+
+Artifact	Description
+
+Scala Code	Generated Spark job
+Mapping ID	Links to NiFi flow
+Mapping Documentation	Human-readable explanation
+Validation Status	Pass/fail
+Version	Important for traceability
+
+
+
+---
+
+🧭 Data Mapping (Important Section)
+
+NiFi → Internal Canonical Model
+
+NiFi Field	Internal Field	Notes
+
+processor.id	processorId	Direct
+component.type	processorType	Normalized
+component.properties	properties	Cleaned
+relationships	relationships	Flattened
+position	(optional)	Usually ignored
+
+
+
+---
+
+Canonical Model → LLM Prompt Model
+
+Internal Field	Prompt Usage
+
+processorType	Determines code template
+properties	Drives parameter mapping
+relationships	Determines data flow
+flow order	Determines Spark pipeline order
+
+
+
+---
+
+LLM Output → Repository Schema
+
+LLM Field	Database Column
+
+scalaCode	code_blob
+mappingDoc	documentation
+confidenceScore	confidence
+timestamp	generated_at
+flowId	nifi_flow_id
+
+
+
+---
+
+⚠️ Enterprise Gaps You May Want to Address
+
+Based on your design (speaking like an architect reviewing HSBC work):
+
+🔴 Recommended Additions
+
+Versioning of generated code
+
+Prompt version tracking
+
+Retry + DLQ for LLM failures
+
+Observability (logs/metrics/traces)
+
+Idempotency for NiFi fetch
+
+Security scanning of generated code
+
+
+
+---
+
+✅ If you want to go senior-level impressive
+
+I can next generate:
+
+Level-1 data mapping matrix
+
+Canonical data model schema
+
+OpenAPI contracts
+
+Event-driven integration (NATS — matches your backend work)
+
+Production risks section (reviewers LOVE this)
